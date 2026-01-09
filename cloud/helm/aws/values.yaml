@@ -87,8 +87,8 @@ liferay-default:
                           -   -c
                           -   |
                                 set -e
-
-                                PRODUCT_VERSION=7.4.13-u134
+                
+                                PRODUCT_VERSION={{ .image.tag }}
                                 DOWNLOAD_FOLDER="$(mktemp -d)"
                                 BASE_FILE_NAME="${DEPLOY_FOLDER}/com.liferay.portal.search.opensearch2"
 
@@ -102,7 +102,7 @@ liferay-default:
                                 DOWNLOAD_OPENSEARCH_MODULES() {
                                   local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${BASE_FILE_NAME}.{api,impl}.jar"
                                 
-                                  echo "Starting to download OpenSearch modules..."
+                                  echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
                                   if curl -L -f \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
                                     -O \
