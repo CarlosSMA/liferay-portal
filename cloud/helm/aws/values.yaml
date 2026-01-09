@@ -94,7 +94,8 @@ liferay-default:
                                 BASE_FILE_NAME="${DEPLOY_FOLDER}/com.liferay.portal.search.opensearch2"
 
                                 VALIDATE_IF_OPENSEARCH_IS_ALREADY_INSTALLED() {
-                                  if [[ -f "opensearch" ]] ; then
+                                  if [[ -f "${BASE_FILE_NAME}.api.jar" && -f "${BASE_FILE_NAME}.impl.jar" ]] ; then
+                                    echo "OpenSearch modules are already installed for the current DXP version. Skipping download and installation processes."
                                     exit 0
                                   fi
                                 }
