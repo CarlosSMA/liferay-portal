@@ -91,17 +91,19 @@ liferay-default:
                                 PRODUCT_VERSION={{ .image.tag }}
                                 DOWNLOAD_FOLDER="$(mktemp -d)"
 
-                                function download_opensearch_modules () {
-                                  local BASE_FILE_NAME="com.liferay.portal.search.opensearch2"
-                                  local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${BASE_FILE_NAME}.{api,impl}.jar"
+                                function download_opensearch_modules {
+                                  local FILE_NAME_PREFIX="com.liferay.portal.search.opensearch2"
+                                  local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${FILE_NAME_PREFIX}.{api,impl}.jar"
 
                                   echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
-                                  if curl -L -f \
+                                  if curl \
+                                    --location \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
-                                    -O \
+                                    --remote-name \
+                                    --fail \
                                     --retry 5 \
-                                    --retry-delay 2 \
                                     --retry-all-errors \
+                                    --retry-delay 2 \
                                     "$URL" ; then
                                     echo "OpenSearch modules downloaded successfully."
                                   else
@@ -112,7 +114,7 @@ liferay-default:
                                   fi
                                 }
 
-                                function main () {
+                                function main {
                                   download_opensearch_modules "$PRODUCT_VERSION"
 
                                   echo "Starting to install OpenSearch modules..."
