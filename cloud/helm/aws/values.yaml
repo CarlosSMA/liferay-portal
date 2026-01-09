@@ -92,11 +92,12 @@ liferay-default:
                                 PRODUCT_VERSION={{ .image.tag }}
 
                                 function download_opensearch_modules {
-                                  local FILE_NAME_PREFIX="com.liferay.portal.search.opensearch2"
-                                  local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${FILE_NAME_PREFIX}.{api,impl}.jar"
-
-                                  echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
-                                  if curl \
+                                    local FILE_NAME_PREFIX="com.liferay.portal.search.opensearch2"
+                                    local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${FILE_NAME_PREFIX}.{api,impl}.jar"
+  
+                                    echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
+  
+                                  if ! curl \
                                     --fail \
                                     --location \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
@@ -105,13 +106,13 @@ liferay-default:
                                     --retry-all-errors \
                                     --retry-delay 2 \
                                     "$URL" ; then
-                                    echo "OpenSearch modules downloaded successfully."
-                                  else
-                                    local EXIT_CODE=$?
-                                    echo "Error: Failed to download OpenSearch modules (Exit code: ${EXIT_CODE})."
-                                    echo "You are likely using an unsupported Liferay image. Please refer to https://releases.liferay.com/opensearch2/dxp"
-                                    exit 1
+                                      local EXIT_CODE=$?
+                                      echo "Error: Failed to download OpenSearch modules (Exit code: ${EXIT_CODE})."
+                                      echo "You are likely using an unsupported Liferay image. Please refer to https://releases.liferay.com/opensearch2/dxp"
+                                      exit 1
                                   fi
+
+                                  echo "OpenSearch modules downloaded successfully."
                                 }
 
                                 function main {
