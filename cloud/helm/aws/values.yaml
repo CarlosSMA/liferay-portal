@@ -79,3 +79,15 @@ liferay-default:
                     requests:
                         storage: 10Gi
                 storageClassName: gp3
+    customInitContainers:
+        x-install-opensearch-modules:
+            - containerTemplate: |
+                  -   command:
+                          -   sh
+                          -   -c
+                          -   |
+                      image: curlimages/curl:latest
+                      name: liferay-install-opensearch-modules
+                      volumeMounts:
+                          -   mountPath: /temp
+                              name: liferay-persistent-volume
