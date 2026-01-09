@@ -80,7 +80,7 @@ liferay-default:
                         storage: 10Gi
                 storageClassName: gp3
     customInitContainers:
-        x-install-opensearch-modules:
+        x-liferay-install-opensearch-modules:
             - containerTemplate: |
                   -   command:
                           -   sh
@@ -88,8 +88,8 @@ liferay-default:
                           -   |
                                 set -e
 
-                                PRODUCT_VERSION={{ .image.tag }}
                                 DOWNLOAD_FOLDER="$(mktemp -d)"
+                                PRODUCT_VERSION={{ .image.tag }}
 
                                 function download_opensearch_modules {
                                   local FILE_NAME_PREFIX="com.liferay.portal.search.opensearch2"
@@ -97,10 +97,10 @@ liferay-default:
 
                                   echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
                                   if curl \
+                                    --fail \
                                     --location \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
                                     --remote-name \
-                                    --fail \
                                     --retry 5 \
                                     --retry-all-errors \
                                     --retry-delay 2 \
