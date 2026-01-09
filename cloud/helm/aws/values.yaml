@@ -83,10 +83,9 @@ liferay-default:
         x-install-opensearch-module:
             - containerTemplate: |
                   -   command:
-                          -   bash
+                          -   sh
                           -   -c
                           -   |
-                                #!/usr/bin/env bash
 
                                 set -e
 
