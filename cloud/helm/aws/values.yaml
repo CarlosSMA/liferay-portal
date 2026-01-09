@@ -86,6 +86,31 @@ liferay-default:
                           -   sh
                           -   -c
                           -   |
+                                set -e
+
+                                PRODUCT_VERSION={{ .image.tag }}
+                                DOWNLOAD_FOLDER="$(mktemp -d)"
+
+                                function download_opensearch_modules () {
+                                  local BASE_FILE_NAME="com.liferay.portal.search.opensearch2"
+                                  local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${BASE_FILE_NAME}.{api,impl}.jar"
+
+                                  echo "Starting to download OpenSearch modules for Product Version ${PRODUCT_VERSION}..."
+                                  if curl -L -f \
+                                    --output-dir "${DOWNLOAD_FOLDER}" \
+                                    -O \
+                                    --retry 5 \
+                                    --retry-delay 2 \
+                                    --retry-all-errors \
+                                    "$URL" ; then
+                                    echo "OpenSearch modules downloaded successfully."
+                                  else
+                                    local EXIT_CODE=$?
+                                    echo "Error: Failed to download OpenSearch modules (Exit code: ${EXIT_CODE})."
+                                    echo "You are likely using an unsupported Liferay image. Please refer to https://releases.liferay.com/opensearch2/dxp"
+                                    exit 1
+                                  fi
+                                }
                       image: curlimages/curl:latest
                       name: liferay-install-opensearch-modules
                       volumeMounts:
