@@ -120,13 +120,12 @@ liferay-default:
                                   VALIDATE_IF_OPENSEARCH_IS_ALREADY_INSTALLED "$PRODUCT_VERSION"
                                   DOWNLOAD_OPENSEARCH_MODULES "$PRODUCT_VERSION"
 
-                                  mv "${DOWNLOAD_FOLDER}"/* "/mnt/deploy"
+                                  mv "${DOWNLOAD_FOLDER}"/* "/temp/liferay/deploy"
                                 }
 
                                 MAIN "$PRODUCT_VERSION"
                       image: curlimages/curl:latest
                       name: liferay-install-opensearch-module
                       volumeMounts:
-                          -   mountPath: /mnt/deploy
+                          -   mountPath: /temp
                               name: liferay-persistent-volume
-                              subPath: /opt/liferay/deploy
