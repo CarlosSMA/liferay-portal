@@ -111,6 +111,16 @@ liferay-default:
                                     exit 1
                                   fi
                                 }
+
+                                function main () {
+                                  download_opensearch_modules "$PRODUCT_VERSION"
+
+                                  echo "Starting to install OpenSearch modules..."
+                                  mv "${DOWNLOAD_FOLDER}"/* "/temp/liferay/deploy"
+                                  echo "OpenSearch modules installed successfully."
+                                }
+
+                                main "$PRODUCT_VERSION"
                       image: curlimages/curl:latest
                       name: liferay-install-opensearch-modules
                       volumeMounts:
