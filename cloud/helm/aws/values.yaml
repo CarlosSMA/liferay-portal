@@ -103,7 +103,7 @@ liferay-default:
                                 DOWNLOAD_OPENSEARCH_MODULES() {
                                   local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${BASE_FILE_NAME}.{api,impl}.jar"
 
-                                  if curl -sL -f \
+                                  if curl -L -f \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
                                     -O \
                                     --retry 5 \
