@@ -86,10 +86,9 @@ liferay-default:
                           -   sh
                           -   -c
                           -   |
-
                                 set -e
 
-                                PRODUCT_VERSION=2025.q1.17-lts
+                                PRODUCT_VERSION=7.4.13-u134
                                 DOWNLOAD_FOLDER="$(mktemp -d)"
                                 BASE_FILE_NAME="${DEPLOY_FOLDER}/com.liferay.portal.search.opensearch2"
 
@@ -99,10 +98,10 @@ liferay-default:
                                     exit 0
                                   fi
                                 }
-
+                
                                 DOWNLOAD_OPENSEARCH_MODULES() {
                                   local URL="https://releases.liferay.com/opensearch2/dxp/${PRODUCT_VERSION}/${BASE_FILE_NAME}.{api,impl}.jar"
-
+                                
                                   echo "Starting to download OpenSearch modules..."
                                   if curl -L -f \
                                     --output-dir "${DOWNLOAD_FOLDER}" \
@@ -111,6 +110,7 @@ liferay-default:
                                     --retry-delay 2 \
                                     --retry-all-errors \
                                     "$URL" ; then
+                                    ls -R "${DOWNLOAD_FOLDER}"
                                     echo "OpenSearch modules downloaded successfully."
                                   else
                                     local EXIT_CODE=$?
@@ -123,7 +123,7 @@ liferay-default:
                                 MAIN() {
                                   VALIDATE_IF_OPENSEARCH_IS_ALREADY_INSTALLED "$PRODUCT_VERSION"
                                   DOWNLOAD_OPENSEARCH_MODULES "$PRODUCT_VERSION"
-
+                                
                                   echo "Starting to install OpenSearch modules..."
                                   mv "${DOWNLOAD_FOLDER}"/* "/temp/liferay/deploy"
                                   echo "OpenSearch modules installed successfully."
