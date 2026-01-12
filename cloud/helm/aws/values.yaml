@@ -39,6 +39,7 @@ liferay-default:
                         - sh
                         - -c
                         - |
+                              {{- if and .search .search.setup }}
                               set -e
                               DOWNLOAD_FOLDER="$(mktemp -d)"
                               PRODUCT_VERSION={{.image.tag}}
@@ -69,6 +70,9 @@ liferay-default:
                                 echo "OpenSearch modules installed successfully."
                               }
                               main "$PRODUCT_VERSION"
+                              {{- else }}
+                              echo "Setup for OpenSearch is not enabled."
+                              {{- end }}
                     image: curlimages/curl:latest
                     name: liferay-install-opensearch-modules
                     volumeMounts:
