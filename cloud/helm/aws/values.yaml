@@ -36,14 +36,10 @@ liferay-default:
         x-liferay-install-opensearch-modules:
             -   containerTemplate: |
                     - command:
-                          - sh
+                          - bash
                           - -c
                           - |
                                 set -e
-                                rm \
-                                    -r \
-                                    -f \
-                                    -v /temp/osgi/modules/*opensearch*
 
                                 function main {
                                     local deploy_dir=/temp/liferay/deploy
@@ -51,6 +47,7 @@ liferay-default:
                                     local product_version={{.image.tag}}
                                     local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/${filename_prefix}.{api,impl}.jar"
 
+                                    rm --recursive --verbose /temp/osgi/modules/*opensearch*
                                     mkdir -p "$deploy_dir"
 
                                     if ! curl \
@@ -68,7 +65,7 @@ liferay-default:
                                 }
 
                                 main
-                      image: curlimages/curl:latest
+                      image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
                       name: liferay-install-opensearch-modules
                       volumeMounts:
                           - mountPath: /temp
