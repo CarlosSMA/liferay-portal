@@ -34,24 +34,20 @@ liferay-default:
                   name: managed-service-details
     customInitContainers:
         x-liferay-install-opensearch-modules:
-            -   containerTemplate: |
-                    - command:
-                          - bash
-                          - -c
-                          - |
-                                set -e
-
-                                function main {
-                                    local deploy_dir=/temp/liferay/deploy
-                                    local filename_prefix="com.liferay.portal.search.opensearch2"
-                                    local product_version={{.image.tag}}
-                                    local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/${filename_prefix}.{api,impl}.jar"
-
-                                    rm --recursive --verbose /temp/osgi/modules/*opensearch*
-
-                                    mkdir -p "$deploy_dir"
-
-                                    local http_code=$(\
+            - containerTemplate: |
+                  - command:
+                        - bash
+                        - -c
+                        - |
+                              set -e
+                              function main {
+                                  local deploy_dir=/temp/liferay/deploy
+                                  local filename_prefix="com.liferay.portal.search.opensearch2"
+                                  local product_version={{.image.tag}}
+                                  local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/${filename_prefix}.{api,impl}.jar"
+                                  rm --recursive --verbose /temp/osgi/modules/*opensearch*
+                                  mkdir -p "$deploy_dir"
+                                  local http_code=$(\
                                       curl \
                                           "$url"
                                           --fail \
@@ -62,19 +58,17 @@ liferay-default:
                                           --retry-all-errors \
                                           --retry-delay 2 \
                                           --write-out "%{http_code}")
-
-                                    if [ "${http_code}" != "200" ] ; then
-                                        echo "Unable to download OpenSearch modules for Product Version ${PRODUCT_VERSION}." >&2
-                                        exit 1
-                                    fi
-                                }
-
-                                main
-                      image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
-                      name: liferay-install-opensearch-modules
-                      volumeMounts:
-                          - mountPath: /temp
-                            name: liferay-persistent-volume
+                                  if ["${http_code}" != "200"] ; then
+                                      echo "Unable to download OpenSearch modules for Product Version ${PRODUCT_VERSION}." >&2
+                                      exit 1
+                                  fi
+                              }
+                              main
+                    image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
+                    name: liferay-install-opensearch-modules
+                    volumeMounts:
+                        - mountPath: /temp
+                          name: liferay-persistent-volume
         x-liferay-overlay:
             - containerTemplate: |
                   - command:
