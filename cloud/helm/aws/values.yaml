@@ -22,101 +22,101 @@ liferay-default:
                 secretKey=""
     customEnv:
         x-liferay-aws:
-            - name: LIFERAY_NETWORK_HOST_ADDRESSES
-              value: https://$(OPENSEARCH_ENDPOINT):443
-            - name: LIFERAY_OPENSEARCH_ENABLED
-              value: "true"
-            - name: LIFERAY_OPENSEARCH_PASSWORD
-              value: $(OPENSEARCH_PASSWORD)
+            -   name: LIFERAY_NETWORK_HOST_ADDRESSES
+                value: https://$(OPENSEARCH_ENDPOINT):443
+            -   name: LIFERAY_OPENSEARCH_ENABLED
+                value: "true"
+            -   name: LIFERAY_OPENSEARCH_PASSWORD
+                value: $(OPENSEARCH_PASSWORD)
     customEnvFrom:
         x-liferay-aws:
-            - secretRef:
-                  name: managed-service-details
+            -   secretRef:
+                    name: managed-service-details
     customInitContainers:
         x-liferay-install-opensearch-modules:
-            - containerTemplate: |
-                  - command:
-                        - bash
-                        - -c
-                        - |
-                              set -e
-                              function main {
-                                  local deploy_dir=/temp/liferay/deploy
-                                  local filename_prefix="com.liferay.portal.search.opensearch2"
-                                  local product_version={{.image.tag}}
-                                  local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/${filename_prefix}.{api,impl}.jar"
-                                  rm --recursive --verbose /temp/osgi/modules/*opensearch*
-                                  mkdir -p "$deploy_dir"
-                                  local http_code=$(\
-                                      curl \
-                                          "$url"
-                                          --fail \
-                                          --location \
-                                          --output-dir "$deploy_dir" \
-                                          --remote-name \
-                                          --retry 5 \
-                                          --retry-all-errors \
-                                          --retry-delay 2 \
-                                          --write-out "%{http_code}")
-                                  if ["${http_code}" != "200"] ; then
-                                      echo "Unable to download OpenSearch modules for Product Version ${PRODUCT_VERSION}." >&2
-                                      exit 1
-                                  fi
-                              }
-                              main
-                    image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
-                    name: liferay-install-opensearch-modules
-                    volumeMounts:
-                        - mountPath: /temp
-                          name: liferay-persistent-volume
+            -   containerTemplate: |
+                    - command:
+                          - bash
+                          - -c
+                          - |
+                                set -e
+                                function main {
+                                    local deploy_dir=/temp/liferay/deploy
+                                    local filename_prefix="com.liferay.portal.search.opensearch2"
+                                    local product_version={{.image.tag}}
+                                    local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/${filename_prefix}.{api,impl}.jar"
+                                    rm --recursive --verbose /temp/osgi/modules/*opensearch*
+                                    mkdir -p "$deploy_dir"
+                                    local http_code=$(\
+                                        curl \
+                                            "$url"
+                                            --fail \
+                                            --location \
+                                            --output-dir "$deploy_dir" \
+                                            --remote-name \
+                                            --retry 5 \
+                                            --retry-all-errors \
+                                            --retry-delay 2 \
+                                            --write-out "%{http_code}")
+                                    if ["${http_code}" != "200"] ; then
+                                        echo "Unable to download OpenSearch modules for Product Version ${PRODUCT_VERSION}." >&2
+                                        exit 1
+                                    fi
+                                }
+                                main
+                      image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
+                      name: liferay-install-opensearch-modules
+                      volumeMounts:
+                          - mountPath: /temp
+                            name: liferay-persistent-volume
         x-liferay-overlay:
-            - containerTemplate: |
-                  - command:
-                        - bash
-                        - -c
-                        - |
-                              {{- if and .overlay .overlay.enabled}}
-                              {{- $overlay := .overlay -}}
-                              {{- range $overlay.dirs}}
-                              tree /mnt/liferay/
-                              mkdir -p /temp/{{.}}
-                              cp -R /mnt/liferay/overlay/{{.}}/* /temp/{{.}}
-                              tree /temp/{{.}}
-                              {{- end}}
-                              {{- else}}
-                              echo "Overlay is not enabled."
-                              {{- end}}
-                    image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
-                    imagePullPolicy: {{.image.pullPolicy}}
-                    name: liferay-overlay
-                    {{- if and .overlay .overlay.enabled}}
-                    volumeMounts:
-                        - mountPath: /mnt/liferay/overlay
-                          name: {{.overlay.bucketName}}
-                          subPath: {{.overlay.bucketPath}}
-                        - mountPath: /temp
-                          name: liferay-persistent-volume
-                    {{- end}}
+            -   containerTemplate: |
+                    - command:
+                          - bash
+                          - -c
+                          - |
+                                {{- if and .overlay .overlay.enabled}}
+                                {{- $overlay := .overlay -}}
+                                {{- range $overlay.dirs}}
+                                tree /mnt/liferay/
+                                mkdir -p /temp/{{.}}
+                                cp -R /mnt/liferay/overlay/{{.}}/* /temp/{{.}}
+                                tree /temp/{{.}}
+                                {{- end}}
+                                {{- else}}
+                                echo "Overlay is not enabled."
+                                {{- end}}
+                      image: {{printf "%s:%s" .image.repository (.image.tag | toString)}}
+                      imagePullPolicy: {{.image.pullPolicy}}
+                      name: liferay-overlay
+                      {{- if and .overlay .overlay.enabled}}
+                      volumeMounts:
+                          - mountPath: /mnt/liferay/overlay
+                            name: {{.overlay.bucketName}}
+                            subPath: {{.overlay.bucketPath}}
+                          - mountPath: /temp
+                            name: liferay-persistent-volume
+                      {{- end}}
     customLabels:
         origin: liferay-aws
     customVolumeMounts:
         x-liferay-aws:
-            - mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
-              name: liferay-configmap
-              subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
-            - mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
-              name: liferay-configmap
-              subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
-            - mountPath: /opt/liferay/osgi/configs/com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
-              name: liferay-configmap
-              subPath: com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
+            -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
+                name: liferay-configmap
+                subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
+            -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
+                name: liferay-configmap
+                subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
+            -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
+                name: liferay-configmap
+                subPath: com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
     portalBundleDenyList:
-        - com.liferay.portal.search.elasticsearch.cross.cluster.replication.impl
-        - com.liferay.portal.search.elasticsearch.monitoring.web
-        - com.liferay.portal.search.elasticsearch7.api
-        - com.liferay.portal.search.elasticsearch7.impl
-        - com.liferay.portal.search.learning.to.rank.api
-        - com.liferay.portal.search.learning.to.rank.impl
+        -   com.liferay.portal.search.elasticsearch.cross.cluster.replication.impl
+        -   com.liferay.portal.search.elasticsearch.monitoring.web
+        -   com.liferay.portal.search.elasticsearch7.api
+        -   com.liferay.portal.search.elasticsearch7.impl
+        -   com.liferay.portal.search.learning.to.rank.api
+        -   com.liferay.portal.search.learning.to.rank.impl
     portalProperties: |
         dl.store.impl=com.liferay.portal.store.s3.S3Store
         jdbc.default.driverClassName=org.postgresql.Driver
@@ -135,12 +135,12 @@ liferay-default:
             service.beta.kubernetes.io/aws-load-balancer-internal: "true"
         type: LoadBalancer
     volumeClaimTemplates:
-        - metadata:
-              name: liferay-persistent-volume
-          spec:
-              accessModes:
-                  - ReadWriteOnce
-              resources:
-                  requests:
-                      storage: 10Gi
-              storageClassName: gp3
+        -   metadata:
+                name: liferay-persistent-volume
+            spec:
+                accessModes:
+                    -   ReadWriteOnce
+                resources:
+                    requests:
+                        storage: 10Gi
+                storageClassName: gp3
