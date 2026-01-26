@@ -220,7 +220,7 @@ podSecurityContext:
     runAsUser: 1000
 portalBundleDenyList: []
 portalComponentDenyList: []
-customProperties:
+customPortalProperties:
 - include-and-override="portal-bundle.properties"
 - liferay.home="${resource.repositories.root}"
 - resource.repositories.root="${default.liferay.home}"
