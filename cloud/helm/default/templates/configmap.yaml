@@ -38,6 +38,12 @@ data:
         {{- if .Values.portalProperties }}
         {{- .Values.portalProperties | nindent 8 }}
         {{- end }}
+        {{- if .Values.customProperties }}
+        {{- range $k, $v := .Values.customProperties -}}
+        {{ . | replace "\"" "" | nindent 8 }}
+        {{- end }}
+        {{- end }}
+
         {{- range $k, $v := .Values.dependencies }}
         {{- if $v.portalProperties }}
         {{- $v.portalProperties | nindent 8 }}
