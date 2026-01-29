@@ -16,7 +16,7 @@ func init() {
 }
 
 func main() {
-	mgr, err := manager.CreateManager()
+	mgr, err := manager.CreateManager(&utils.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}

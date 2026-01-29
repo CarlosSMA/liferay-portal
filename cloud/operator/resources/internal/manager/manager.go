@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"errors"
 	"github.com/caarlos0/env/v11"
 	"github.com/liferay/liferay-portal/cloud/operator/internal/utils"
 	"k8s.io/apimachinery/pkg/labels"
@@ -10,10 +11,14 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
-func CreateManager() (ctrl.Manager, error) {
-	cfg, err := env.ParseAs[Config]()
-	if err != nil {
+func CreateManager(config interface{}) (ctrl.Manager, error) {
+	if err := env.Parse(config); err != nil {
 		return nil, err
+	}
+
+	cf, ok := config.(*utils.Config)
+	if !ok {
+		return nil, errors.New("config is not a valid *utils.Config")
 	}
 
 	mgr, err := ctrl.NewManager(
@@ -26,9 +31,9 @@ func CreateManager() (ctrl.Manager, error) {
 					},
 				),
 			},
-			HealthProbeBindAddress: cfg.ProbeAddress,
+			HealthProbeBindAddress: cf.ProbeAddress,
 			Metrics: metricsserver.Options{
-				BindAddress: cfg.MetricsAddress,
+				BindAddress: cf.MetricsAddress,
 			},
 			Scheme: utils.Scheme,
 		},
@@ -52,9 +57,4 @@ func CreateManager() (ctrl.Manager, error) {
 	}
 
 	return mgr, nil
-}
-
-type Config struct {
-	MetricsAddress string `env:"METRICS_ADDRESS" envDefault:":8080"`
-	ProbeAddress   string `env:"PROBE_ADDRESS" envDefault:":8081"`
 }
