@@ -2,8 +2,8 @@
 {{ include "liferay.statefulset" $main }}
 {{- range $k, $v := .Values.dependencies }}
 {{- if eq $v.source "statefulset" }}
----
-{{- $dependence := dict "name" $k "statefulset" $v.statefulset "root" $ }}
-{{ include "liferay.statefulset" $dependence }}
-{{- end }}
-{{- end }}
+# ---
+# {{- $dependence := dict "name" $k "statefulset" $v.statefulset "root" $ }}
+# {{ include "liferay.statefulset" $dependence }}
+# {{- end }}
+# {{- end }}

@@ -20,12 +20,6 @@ spec:
             {{- include "liferay.selectorLabels" .root | nindent 12 }}
     serviceName: {{ include "liferay.name" .root }}{{ $suffix }}
     template:
-        metadata:
-            annotations:
-                checksum/config: {{ include (print .root.Template.BasePath "/configmap.yaml") .root | sha256sum }}
-            labels:
-                app: {{ include "liferay.name" .root }}{{ $suffix }}
-                {{- include "liferay.labels" .root | nindent 16 }}
         spec:
             {{- with .statefulset.affinity }}
             affinity:
@@ -114,12 +108,6 @@ spec:
                 {{- end }}
                 {{- range $k, $v := .statefulset.customInitContainers }}
                 {{- range $entry := $v }}
-                {{- if $entry.containerTemplate }}
-                {{- tpl $entry.containerTemplate $statefulset | nindent 16 }}
-                {{- else }}
-                -   #
-                    {{- toYaml $entry | nindent 18 }}
-                {{- end }}
                 {{- end }}
                 {{- end }}
             {{- end }}
