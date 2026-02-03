@@ -4,9 +4,6 @@ data "aws_eks_cluster" "cluster" {
 	name=local.cluster_name
 	region=var.region
 }
-data "aws_iam_roles" "opensearch_linked_role_lookup" {
-	name_regex="AWSServiceRoleForAmazonOpenSearchService"
-}
 data "aws_subnets" "private" {
 	filter {
 		name="tag:DeploymentName"

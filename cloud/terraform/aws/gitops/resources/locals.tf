@@ -109,6 +109,5 @@ locals {
 	)
 	liferay_service_account_role_name="${var.deployment_name}-irsa"
 	oidc_provider=replace(data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer, "https://", "")
-	should_create_opensearch_linked_role=length(data.aws_iam_roles.opensearch_linked_role_lookup.arns) == 0
 	terraform_manager_name="liferay-cloud-native-terraform"
 }

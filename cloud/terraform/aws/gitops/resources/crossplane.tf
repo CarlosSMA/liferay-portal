@@ -70,33 +70,7 @@ resource "aws_iam_policy" "provider_aws_iam_policy" {
 		Version="2012-10-17"
 	})
 }
-resource "aws_iam_policy" "provider_aws_opensearch_policy" {
-	name="${local.cluster_name}-provider-aws-opensearch"
-	policy=jsonencode({
-		Statement=[
-			{
-				Action=[
-					"es:AddTags",
-					"es:CreateDomain",
-					"es:DeleteDomain",
-					"es:DescribeDomain",
-					"es:DescribeDomainConfig",
-					"es:DescribeDomainHealth",
-					"es:DescribeDomainNodes",
-					"es:ESHttpGet",
-					"es:ESHttpPut",
-					"es:ListDomainNames",
-					"es:ListTags",
-					"es:RemoveTags",
-					"es:UpdateDomainConfig",
-				]
-				Effect="Allow"
-				Resource="*"
-			},
-		]
-		Version="2012-10-17"
-	})
-}
+
 resource "aws_iam_policy" "provider_aws_rds_policy" {
 	name="${local.cluster_name}-provider-aws-rds"
 	policy=jsonencode({
@@ -233,30 +207,7 @@ resource "aws_iam_role" "provider_aws_iam_role" {
 		})
 	name="${local.cluster_name}-provider-aws-iam-role"
 }
-resource "aws_iam_role" "provider_aws_opensearch_role" {
-	assume_role_policy=jsonencode(
-		{
-			Statement=[
-				{
-					Action="sts:AssumeRoleWithWebIdentity"
-					Condition={
-						StringEquals={
-							"${local.oidc_provider}:aud"="sts.amazonaws.com"
-						}
-						StringLike={
-							"${local.oidc_provider}:sub"="system:serviceaccount:${var.crossplane_namespace}:provider-aws-opensearch*"
-						}
-					}
-					Effect="Allow"
-					Principal={
-						Federated="arn:aws:iam::${local.account_id}:oidc-provider/${local.oidc_provider}"
-					}
-				},
-			]
-			Version="2012-10-17"
-		})
-	name="${local.cluster_name}-provider-aws-opensearch-role"
-}
+
 resource "aws_iam_role" "provider_aws_rds_role" {
 	assume_role_policy=jsonencode(
 		{
@@ -313,10 +264,7 @@ resource "aws_iam_role_policy_attachment" "provider_aws_iam_attachment" {
 	policy_arn=aws_iam_policy.provider_aws_iam_policy.arn
 	role=aws_iam_role.provider_aws_iam_role.name
 }
-resource "aws_iam_role_policy_attachment" "provider_aws_opensearch_attachment" {
-	policy_arn=aws_iam_policy.provider_aws_opensearch_policy.arn
-	role=aws_iam_role.provider_aws_opensearch_role.name
-}
+
 resource "aws_iam_role_policy_attachment" "provider_aws_rds_attachment" {
 	policy_arn=aws_iam_policy.provider_aws_rds_policy.arn
 	role=aws_iam_role.provider_aws_rds_role.name
@@ -325,10 +273,7 @@ resource "aws_iam_role_policy_attachment" "provider_aws_s3_attachment" {
 	policy_arn=aws_iam_policy.provider_aws_s3_policy.arn
 	role=aws_iam_role.provider_aws_s3_role.name
 }
-resource "aws_iam_service_linked_role" "opensearch_linked_role" {
-	aws_service_name="opensearchservice.amazonaws.com"
-	count=local.should_create_opensearch_linked_role ? 1 : 0
-}
+
 resource "kubernetes_manifest" "function_auto_ready" {
 	manifest={
 		apiVersion="pkg.crossplane.io/v1beta1"
