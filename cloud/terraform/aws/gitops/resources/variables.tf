@@ -92,6 +92,7 @@ variable "liferay_git_repo_config" {
 			revision=optional(string, "HEAD")
 			source_paths=object({
 				base=optional(string, "liferay/projects/{{path[2]}}/base")
+				charts=optional(string, "charts")
 				environments=optional(string, "liferay/projects/*/environments/*")
 				values_filename=optional(string, "liferay.yaml")
 			})

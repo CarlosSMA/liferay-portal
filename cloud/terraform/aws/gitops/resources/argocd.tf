@@ -271,7 +271,6 @@ resource "kubernetes_manifest" "liferay_applicationset" {
 					project=local.liferay_appproject_name
 					sources=[
 						{
-							chart=local.liferay_helm_chart_config.source_chart_value
 							helm={
 								parameters=[
 									{
@@ -292,8 +291,9 @@ resource "kubernetes_manifest" "liferay_applicationset" {
 									"$values/{{path}}/${var.liferay_git_repo_config.source_paths.values_filename}",
 								]
 							}
-							repoURL=local.liferay_helm_chart_config.source_repo_url_value
-							targetRevision=local.liferay_helm_chart_config.version
+							path=var.liferay_git_repo_config.source_paths.charts
+							repoURL=var.liferay_git_repo_url
+							targetRevision=var.liferay_git_repo_config.revision
 						},
 						{
 							ref="values"
@@ -360,8 +360,6 @@ resource "kubernetes_manifest" "liferay_appproject" {
 				},
 			]
 			sourceRepos=[
-				"${local.liferay_helm_chart_config.source_repo_url_value}",
-				"${local.liferay_helm_chart_config.source_repo_url_value}/*",
 				var.liferay_git_repo_url,
 			]
 		}
