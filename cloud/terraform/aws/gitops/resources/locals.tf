@@ -86,16 +86,16 @@ locals {
 			ecr_credentials_sync_required=false
 			name="liferay-default"
 			region=var.region
-			source_chart_value="liferay-default"
-			source_repo_url_value="oci://us-central1-docker.pkg.dev/liferay-artifact-registry/liferay-helm-chart/liferay-default"
+			source_chart_value="charts/default"
+			source_repo_url_value=var.liferay_git_repo_url
 			values_scope_prefix=""
 		} : {},
 		var.liferay_helm_chart_name == "liferay-aws" ? {
 			ecr_credentials_sync_required=false
 			name="liferay-aws"
 			region=var.region
-			source_chart_value="liferay-aws"
-			source_repo_url_value="oci://us-central1-docker.pkg.dev/liferay-artifact-registry/liferay-helm-chart/liferay-aws"
+			source_chart_value="charts/aws"
+			source_repo_url_value=var.liferay_git_repo_url
 			values_scope_prefix="liferay-default."
 		} : {},
 		var.liferay_helm_chart_name == "liferay-aws-marketplace" ? {
