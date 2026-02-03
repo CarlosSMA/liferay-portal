@@ -15,8 +15,8 @@ resource "helm_release" "argocd" {
 				applicationSet={
 					resources={
 						limits={
-							cpu="800m"
-							memory="2Gi"
+							cpu="1600m"
+							memory="4Gi"
 						}
 						requests={
 							cpu="500m"
