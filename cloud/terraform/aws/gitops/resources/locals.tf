@@ -82,9 +82,6 @@ locals {
 	infrastructure_git_repo_url=coalesce(var.infrastructure_git_repo_config.url, var.liferay_git_repo_url)
 	liferay_appproject_name="liferay-application"
 	liferay_helm_chart_config=merge(
-		{
-			version=var.liferay_helm_chart_version
-		},
 		var.liferay_helm_chart_name == "liferay-default" ? {
 			ecr_credentials_sync_required=false
 			name="liferay-default"

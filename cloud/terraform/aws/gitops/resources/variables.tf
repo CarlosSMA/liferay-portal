@@ -127,9 +127,6 @@ variable "liferay_helm_chart_name" {
 		error_message="The 'liferay_helm_chart_name' value must be 'liferay-default', 'liferay-aws', or 'liferay-aws-marketplace'."
 	}
 }
-variable "liferay_helm_chart_version" {
-	type=string
-}
 variable "region" {
 	default="us-west-2"
 }
