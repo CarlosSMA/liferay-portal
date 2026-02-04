@@ -166,7 +166,7 @@ resource "kubernetes_manifest" "infrastructure_provider_application" {
 			}
 			project=local.infrastructure_appproject_name
 			source={
-				chart=var.infrastructure_provider_helm_chart_config.image_name
+				# chart=var.infrastructure_provider_helm_chart_config.image_name
 				helm={
 					parameters=[
 						{
@@ -204,7 +204,8 @@ resource "kubernetes_manifest" "infrastructure_provider_application" {
 					]
 				}
 				repoURL=var.liferay_git_repo_url
-				targetRevision=var.infrastructure_provider_helm_chart_config.version
+				targetRevision="HEAD"
+				path="charts/aws-infrastructure-provider"
 			}
 			syncPolicy={
 				automated={
