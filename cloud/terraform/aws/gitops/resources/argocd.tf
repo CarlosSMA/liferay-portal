@@ -128,8 +128,7 @@ resource "kubernetes_manifest" "infrastructure_appproject" {
 			sourceRepos=[
 				"${var.infrastructure_helm_chart_config.image_url}",
 				"${var.infrastructure_helm_chart_config.image_url}/*",
-				"${var.infrastructure_provider_helm_chart_config.image_url}",
-				"${var.infrastructure_provider_helm_chart_config.image_url}/*",
+				"${var.infrastructure_provider_helm_chart_config.charts}",
 				local.infrastructure_git_repo_url,
 			]
 		}
@@ -204,7 +203,7 @@ resource "kubernetes_manifest" "infrastructure_provider_application" {
 						},
 					]
 				}
-				repoURL=var.infrastructure_provider_helm_chart_config.image_url
+				repoURL=var.liferay_git_repo_url
 				targetRevision=var.infrastructure_provider_helm_chart_config.version
 			}
 			syncPolicy={
