@@ -1,0 +1,18 @@
+deployment_name="carlos-alvarez-usv1"
+demo_mode=true
+region="us-east-2"
+liferay_git_repo_config={
+	auth={
+		vault_secret_name="argocd/pat/carlos-alvarez"
+	}
+	source_paths={}
+	target={}
+}
+infrastructure_provider_helm_chart_config={
+	auth={
+		vault_secret_name="argocd/pat/carlos-alvarez"
+	}
+	source_paths={}
+	target={}
+}
+liferay_git_repo_url="https://github.com/CarlosSMA/cloud-native-gitops-boilerplate-v2.git"
