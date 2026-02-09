@@ -42,9 +42,9 @@ spec:
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
                     {{- end }}
-                    {{- if and .Values.opensearch .Values.opensearch.enabled }}
-                        {{- range $k, $v := .Values.opensearch.envs }}
-                        {{- toYaml $v | nindent 22 }}
+                    {{- if and .statefulset.opensearch .statefulset.opensearch.enabled }}
+                        {{- with .statefulset.opensearch.envs }}
+                        {{- toYaml . | nindent 22 }}
                         {{- end }}
                     {{- end }}
                     {{- if or .statefulset.envFrom .statefulset.customEnvFrom }}
@@ -96,13 +96,13 @@ spec:
                         {{- range $k, $v := .statefulset.customVolumeMounts }}
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
-                        {{- if and .Values.opensearch .Values.opensearch.enabled }}
-                        -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
-                            name: liferay-configmap
-                            subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
-                        -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
-                            name: liferay-configmap
-                            subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
+                        {{- if and .statefulset.opensearch .statefulset.opensearch.enabled }}
+                      - mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
+                        name: liferay-configmap
+                        subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
+                      - mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
+                        name: liferay-configmap
+                        subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config
                         {{- end }}
                     {{- end }}
             {{- if or .statefulset.pullSecrets .statefulset.customPullSecrets}}

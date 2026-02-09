@@ -67,7 +67,7 @@ data:
             {{- $PREFIX = "," -}}
             {{- end }}
             {{- end }}
-            {{-if and .Values.opensearch .Values.opensearch.enabled }}
+            {{- if and .Values.opensearch .Values.opensearch.enabled }}
             {{- range $bundle := .Values.opensearch.denyList }}
             {{ $PREFIX }}{{ $bundle | quote }}\
             {{- $PREFIX = "," -}}

@@ -381,7 +381,7 @@ volumes:
             optional: true
         name: liferay-configmap
 opensearch:
-    enabled: {}
+    enabled: false
     envs:
         -   name: LIFERAY_NETWORK_HOST_ADDRESSES
             value: https://$(OPENSEARCH_ENDPOINT):443
