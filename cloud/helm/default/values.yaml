@@ -382,6 +382,13 @@ volumes:
         name: liferay-configmap
 opensearch:
     enabled: {}
+    envs:
+        -   name: LIFERAY_NETWORK_HOST_ADDRESSES
+            value: https://$(OPENSEARCH_ENDPOINT):443
+        -   name: LIFERAY_OPENSEARCH_ENABLED
+            value: "true"
+        -   name: LIFERAY_OPENSEARCH_PASSWORD
+            value: $(OPENSEARCH_PASSWORD)
     denyList:
         -   com.liferay.portal.search.elasticsearch.cross.cluster.replication.impl
         -   com.liferay.portal.search.elasticsearch.monitoring.web

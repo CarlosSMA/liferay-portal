@@ -42,6 +42,11 @@ spec:
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
                     {{- end }}
+                    {{- if .Values.opensearch.enabled }}
+                        {{- range $k, $v := .Values.opensearch.envs }}
+                        {{- toYaml $v | nindent 22 }}
+                        {{- end }}
+                    {{- end }}
                     {{- if or .statefulset.envFrom .statefulset.customEnvFrom }}
                     envFrom:
                         {{- with .statefulset.envFrom }}
