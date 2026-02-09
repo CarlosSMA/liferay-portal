@@ -21,6 +21,7 @@ liferay-default:
                         -   bash
                         -   -c
                         -   |
+                            {{- if and .opensearch .opensearch.enabled }}
                             set -e
 
                             function download_module {
@@ -55,6 +56,9 @@ liferay-default:
                             }
 
                             main
+                            {{- else }}
+                            echo "OpenSearch is not enabled."
+                            {{- end }}
                         image: {{ printf "%s:%s" .image.repository (.image.tag | toString) }}
                         imagePullPolicy: {{ .image.pullPolicy }}
                         name: liferay-install-opensearch-modules
