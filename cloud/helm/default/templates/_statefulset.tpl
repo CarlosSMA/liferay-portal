@@ -42,7 +42,7 @@ spec:
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
                     {{- end }}
-                    {{- if .Values.opensearch.enabled }}
+                    {{- if and .Values.opensearch .Values.opensearch.enabled }}
                         {{- range $k, $v := .Values.opensearch.envs }}
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
@@ -96,7 +96,7 @@ spec:
                         {{- range $k, $v := .statefulset.customVolumeMounts }}
                         {{- toYaml $v | nindent 22 }}
                         {{- end }}
-                        {{- if .Values.opensearch.enabled }}
+                        {{- if and .Values.opensearch .Values.opensearch.enabled }}
                         -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
                             name: liferay-configmap
                             subPath: com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config
