@@ -22,6 +22,20 @@ resource "kubernetes_manifest" "elasticsearch" {
           "config" = {
             "node.store.allow_mmap" = false
           }
+          "podTemplate" = {
+            "spec" = {
+              "initContainers" = [
+                {
+                  "name" = "install-plugins"
+                  "command" = [
+                    "sh",
+                    "-c",
+                    "bin/elasticsearch-plugin install --batch analysis-icu analysis-kuromoji analysis-smartcn analysis-stempel"
+                  ]
+                }
+              ]
+            }
+          }
           "volumeClaimTemplates" = [
             {
               "metadata" = {
