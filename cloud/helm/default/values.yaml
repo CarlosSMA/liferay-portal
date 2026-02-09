@@ -382,3 +382,10 @@ volumes:
         name: liferay-configmap
 opensearch:
     enabled: {}
+    denyList:
+        -   com.liferay.portal.search.elasticsearch.cross.cluster.replication.impl
+        -   com.liferay.portal.search.elasticsearch.monitoring.web
+        -   com.liferay.portal.search.elasticsearch7.api
+        -   com.liferay.portal.search.elasticsearch7.impl
+        -   com.liferay.portal.search.learning.to.rank.api
+        -   com.liferay.portal.search.learning.to.rank.impl

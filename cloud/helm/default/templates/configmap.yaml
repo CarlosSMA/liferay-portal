@@ -67,6 +67,12 @@ data:
             {{- $PREFIX = "," -}}
             {{- end }}
             {{- end }}
+            {{-if .Values.opensearch.enabled }}
+            {{- range $bundle := .Values.opensearch.denyList }}
+            {{ $PREFIX }}{{ $bundle | quote }}\
+            {{- $PREFIX = "," -}}
+            {{- end }}
+            {{- end }}
         ]
         configuration.override.com.liferay.portal.component.blacklist.internal.configuration.ComponentBlacklistConfiguration_blacklistComponentNames=[\
             {{- $PREFIX := "" }}
