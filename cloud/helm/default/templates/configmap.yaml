@@ -34,6 +34,18 @@ data:
         caCertData="$[secret:ca.crt]"
         namespace="$[secret:namespace]"
         saToken="$[secret:token]"
+    {{- if .Values.opensearch.enabled }}
+    com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config: |
+        remoteClusterConnectionId="REMOTE"
+    com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config: |
+        active=B"true"
+        authenticationEnabled=B"true"
+        connectionId="REMOTE"
+        httpSSLEnabled=B"false"
+        networkHostAddresses=["https://$[env:OPENSEARCH_ENDPOINT]"]
+        password="$[env:OPENSEARCH_PASSWORD]"
+        username="$[env:OPENSEARCH_USERNAME]"
+    {{- end }}
     portal-cloud.properties: |
         {{- if .Values.portalProperties }}
         {{- .Values.portalProperties | nindent 8 }}

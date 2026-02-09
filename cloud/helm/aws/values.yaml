@@ -3,16 +3,6 @@ liferay-aws-backup-restore:
 liferay-default:
     configmap:
         data:
-            com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration.config: |
-                remoteClusterConnectionId="REMOTE"
-            com.liferay.portal.search.opensearch2.configuration.OpenSearchConnectionConfiguration-REMOTE.config: |
-                active=B"true"
-                authenticationEnabled=B"true"
-                connectionId="REMOTE"
-                httpSSLEnabled=B"false"
-                networkHostAddresses=["https://$[env:OPENSEARCH_ENDPOINT]"]
-                password="$[env:OPENSEARCH_PASSWORD]"
-                username="$[env:OPENSEARCH_USERNAME]"
             com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config: |
                 accessKey=""
                 bucketName="$[env:S3_BUCKET_ID]"
