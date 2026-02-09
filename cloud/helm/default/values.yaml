@@ -380,3 +380,5 @@ volumes:
             name: liferay-default
             optional: true
         name: liferay-configmap
+opensearch:
+    enabled: {}
