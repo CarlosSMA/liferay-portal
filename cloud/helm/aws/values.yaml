@@ -3,6 +3,7 @@ liferay-aws-backup-restore:
 liferay-default:
     opensearch:
         enabled: false
+        enableInitContainer: false
     configmap:
         data:
             com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config: |
@@ -23,7 +24,7 @@ liferay-default:
                         -   bash
                         -   -c
                         -   |
-                            {{- if and .opensearch .opensearch.enabled }}
+                            {{- if and .opensearch .opensearch.enableInitContainer }}
                             set -e
 
                             function download_module {
