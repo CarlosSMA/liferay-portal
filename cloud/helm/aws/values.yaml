@@ -76,13 +76,6 @@ liferay-default:
             -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
                 name: liferay-configmap
                 subPath: com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config
-    portalBundleDenyList:
-        -   com.liferay.portal.search.elasticsearch.cross.cluster.replication.impl
-        -   com.liferay.portal.search.elasticsearch.monitoring.web
-        -   com.liferay.portal.search.elasticsearch7.api
-        -   com.liferay.portal.search.elasticsearch7.impl
-        -   com.liferay.portal.search.learning.to.rank.api
-        -   com.liferay.portal.search.learning.to.rank.impl
     portalProperties: |
         dl.store.impl=com.liferay.portal.store.s3.S3Store
         jdbc.default.driverClassName=org.postgresql.Driver
