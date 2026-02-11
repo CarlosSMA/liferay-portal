@@ -60,6 +60,7 @@ variable "infrastructure_helm_chart_config" {
 		{
 			image_name=optional(string, "liferay-aws-infrastructure")
 			image_url=optional(string, "oci://us-central1-docker.pkg.dev/external-assets-prd/liferay-helm-chart/liferay-aws-infrastructure")
+			charts=optional(string, "charts/aws-infrastructure")
 			version=optional(string, "0.1.3")
 		})
 }

@@ -49,7 +49,7 @@ resource "kubernetes_manifest" "infrastructure_applicationset" {
 					project=local.infrastructure_appproject_name
 					sources=[
 						{
-							chart=var.infrastructure_helm_chart_config.image_name
+							# chart=var.infrastructure_helm_chart_config.image_name
 							helm={
 								parameters=[
 									{
@@ -66,13 +66,14 @@ resource "kubernetes_manifest" "infrastructure_applicationset" {
 									"$values/{{path}}/${var.infrastructure_git_repo_config.source_paths.values_filename}",
 								]
 							}
-							repoURL=var.infrastructure_helm_chart_config.image_url
-							targetRevision=var.infrastructure_helm_chart_config.version
+							path="charts/aws-infrastructure"
+							repoURL=var.liferay_git_repo_url
+							targetRevision="HEAD"
 						},
 						{
 							ref="values"
-							repoURL=local.infrastructure_git_repo_url
-							targetRevision=var.infrastructure_git_repo_config.revision
+							repoURL=var.liferay_git_repo_url
+							targetRevision="HEAD"
 						},
 					]
 					syncPolicy={
