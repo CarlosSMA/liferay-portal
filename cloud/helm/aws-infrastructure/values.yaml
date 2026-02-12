@@ -7,3 +7,14 @@ backup:
             schedule: cron(0 5 * * ? *)
             startWindow: 60
 enabled: true
+search:
+    customEnv: {}
+    enabled: false
+    env: {}
+    javaOpts: {}
+    maxMapCount: {}
+    name: {}
+    nodeCount: {}
+    resources: {}
+    version: {}
+    volumeSize: {}
