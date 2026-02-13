@@ -26,6 +26,7 @@ resource "helm_release" "argocd" {
 				}
 				configs={
 					cm={
+						"kustomize.buildOptions"="--enable-helm"
 						"application.resourceTrackingMethod"="annotation"
 						"resource.exclusions"=yamlencode(
 							[

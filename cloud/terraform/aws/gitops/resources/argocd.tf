@@ -125,6 +125,10 @@ resource "kubernetes_manifest" "infrastructure_appproject" {
 					namespace=var.crossplane_namespace
 					server="https://kubernetes.default.svc"
 				},
+				{
+					namespace = "elastic-system"
+					server    = "https://kubernetes.default.svc"
+				}
 			]
 			sourceRepos=[
 				"${var.infrastructure_helm_chart_config.image_url}",
@@ -166,48 +170,54 @@ resource "kubernetes_manifest" "infrastructure_provider_application" {
 				server="https://kubernetes.default.svc"
 			}
 			project=local.infrastructure_appproject_name
-			source={
-				# chart=var.infrastructure_provider_helm_chart_config.image_name
-				helm={
-					parameters=[
-						{
-							name="aws.accountId"
-							value=local.account_id
-						},
-						{
-							name="aws.clusterName"
-							value=local.cluster_name
-						},
-						{
-							name="aws.nodesSecurityGroupId"
-							value=data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
-						},
-						{
-							name="aws.privateSubnetIds"
-							value=jsonencode(data.aws_subnets.private.ids)
-						},
-						{
-							name="aws.vpcId"
-							value=data.aws_vpc.current.id
-						},
-						{
-							name="crossplaneNamespace"
-							value=var.crossplane_namespace
-						},
-						{
-							name="deploymentName"
-							value=var.deployment_name
-						},
-						{
-							name="liferayServiceAccountRoleName"
-							value=local.liferay_service_account_role_name
-						},
-					]
+			sources = [
+				{
+					repoURL        = var.liferay_git_repo_url
+					targetRevision = "HEAD"
+					path           = "charts/aws-infrastructure-provider"
+					helm = {
+						parameters = [
+							{
+								name  = "aws.accountId"
+								value = local.account_id
+							},
+							{
+								name  = "aws.clusterName"
+								value = local.cluster_name
+							},
+							{
+								name  = "aws.nodesSecurityGroupId"
+								value = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+							},
+							{
+								name  = "aws.privateSubnetIds"
+								value = jsonencode(data.aws_subnets.private.ids)
+							},
+							{
+								name  = "aws.vpcId"
+								value = data.aws_vpc.current.id
+							},
+							{
+								name  = "crossplaneNamespace"
+								value = var.crossplane_namespace
+							},
+							{
+								name  = "deploymentName"
+								value = var.deployment_name
+							},
+							{
+								name  = "liferayServiceAccountRoleName"
+								value = local.liferay_service_account_role_name
+							},
+						]
+					}
+				},
+				{
+					repoURL        = var.liferay_git_repo_url
+					targetRevision = "HEAD"
+					path           = "charts/aws-infrastructure-provider"
 				}
-				repoURL=var.liferay_git_repo_url
-				targetRevision="HEAD"
-				path="charts/aws-infrastructure-provider"
-			}
+			]
 			syncPolicy={
 				automated={
 					prune=true
