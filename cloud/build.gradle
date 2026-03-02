@@ -1,60 +1,90 @@
-
 import java.util.regex.Matcher
 
 task updateFileVersions {
-    description = 'Updates the PATCH version in Chart.yaml files.'
+    description = 'Updates chart versions based on type (major, minor, patch, alpha).'
+
     doLast {
-        def defaultChartPath = 'helm/default/Chart.yaml'
-        def awsChartPath = 'helm/aws/Chart.yaml'
+        // 1. Validate and extract 'chart' argument (Mandatory)
+        if (!project.hasProperty('chart')) {
+            throw new GradleException("Missing required argument: -Pchart (e.g., -Pchart=aws)")
+        }
+        def chartName = project.property('chart')
 
-        def defaultChartFile = file(defaultChartPath)
-        if (!defaultChartFile.exists()) {
-            throw new FileNotFoundException("File not found: ${defaultChartPath}")
+        // 2. Validate and extract 'type' argument (Mandatory)
+        if (!project.hasProperty('type')) {
+            throw new GradleException("Missing required argument: -Ptype (e.g., -Ptype=patch, -Ptype=minor, -Ptype=major, -Ptype=alpha)")
+        }
+        def updateType = project.property('type')
+
+        // 3. Construct and verify file path
+        def chartPath = "helm/${chartName}/Chart.yaml"
+        def chartFile = file(chartPath)
+
+        if (!chartFile.exists()) {
+            throw new GradleException("The chart '${chartName}' does not exist at path: ${chartPath}")
         }
 
-        def oldVersion
-        def newVersion
-
-        // 1. Read default chart, find current version, and calculate new version
-        String content = defaultChartFile.getText('UTF-8')
+        // 4. Read and Parse Version
+        String content = chartFile.getText('UTF-8')
         Matcher matcher = (content =~ '(?m)^version:\\s*(.*)')
-        if (matcher.find()) {
-            oldVersion = matcher.group(1).trim()
-            def versionParts = oldVersion.tokenize('.')
-            if (versionParts.size() != 3) {
-                throw new GradleException("Version format in ${defaultChartPath} is not MAJOR.MINOR.PATCH: ${oldVersion}")
-            }
-            def newPatch = versionParts[2].toInteger() + 1
-            newVersion = "${versionParts[0]}.${versionParts[1]}.${newPatch}"
-            println "==> Updating from version ${oldVersion} to ${newVersion}"
-        } else {
-            throw new GradleException("Could not find 'version:' in ${defaultChartPath}")
+        
+        if (!matcher.find()) {
+            throw new GradleException("Could not find 'version:' line in ${chartPath}")
         }
 
-        // 2. Update version in default/Chart.yaml
-        def newDefaultContent = content.replaceAll("version:\\s*${oldVersion}", "version: ${newVersion}")
-        defaultChartFile.write(newDefaultContent, 'UTF-8')
-        println "==> Updated version in ${defaultChartPath}"
+        String oldVersion = matcher.group(1).trim()
+        String newVersion = calculateNewVersion(oldVersion, updateType)
 
-        // 3. Update versions in aws/Chart.yaml
-        def awsChartFile = file(awsChartPath)
-        if (!awsChartFile.exists()) {
-            throw new FileNotFoundException("File not found: ${awsChartPath}")
-        }
+        println "==> [${chartName}] Updating ${oldVersion} -> ${newVersion} (${updateType})"
 
-        String awsContent = awsChartFile.getText('UTF-8')
-
+        // 5. Update File Content
         // Update top-level version
-        String newAwsContent = awsContent.replaceAll("version:\\s*${oldVersion}", "version: ${newVersion}")
-
-        // Update dependency version
-        newAwsContent = newAwsContent.replaceAll("(?m)(name: default\\s*.*?version:\\s*)${oldVersion}", "\$1${newVersion}")
-
-        if (awsContent != newAwsContent) {
-            awsChartFile.write(newAwsContent, 'UTF-8')
-            println "==> Updated versions in ${awsChartPath}"
-        } else {
-             println "==> No version changes needed in ${awsChartPath}"
+        String newContent = content.replaceAll(/(?m)^version:\s*.*/, "version: ${newVersion}")
+        
+        // Update dependency version (chaining from newContent to preserve previous change)
+        newContent = newContent.replaceAll(/(?m)(name: default\s*.*?version:\s*).*?$/) { _, prefix ->
+            "${prefix}${newVersion}"
         }
+
+        // 6. Write to file
+        chartFile.write(newContent, 'UTF-8')
+        println "==> Success! ${chartPath} updated."
+    }
+}
+
+/**
+ * Helper to handle the versioning logic
+ */
+def calculateNewVersion(String current, String type) {
+    // Strip alpha suffix if present to get the base semver (e.g., 1.0.0-abc -> 1.0.0)
+    def baseVersion = current.split('-')[0]
+    def parts = baseVersion.tokenize('.')
+    
+    if (parts.size() < 3) {
+        throw new GradleException("Version format in Chart.yaml is not MAJOR.MINOR.PATCH: ${current}")
+    }
+
+    int major = parts[0].toInteger()
+    int minor = parts[1].toInteger()
+    int patch = parts[2].toInteger()
+
+    switch (type.toLowerCase()) {
+        case 'major': 
+            return "${major + 1}.0.0"
+        case 'minor': 
+            return "${major}.${minor + 1}.0"
+        case 'patch': 
+            return "${major}.${minor}.${patch + 1}"
+        case 'alpha':
+            def hash = "alpha"
+            try {
+                // Attempts to get the 7-character git hash
+                hash = "git rev-parse --short HEAD".execute().text.trim()
+            } catch (Exception ignored) {
+                // Fallback if git is not installed or initialized
+            }
+            return "${major}.${minor}.${patch}-${hash}"
+        default:
+            throw new GradleException("Unknown update type: ${type}. Valid options: major, minor, patch, alpha.")
     }
 }
