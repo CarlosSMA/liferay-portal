@@ -1,90 +1,84 @@
 import java.util.regex.Matcher
 
 task updateFileVersions {
-    description = 'Updates chart versions based on type (major, minor, patch, alpha).'
+    description = 'Updates chart versions. If default is updated, aws is updated as a dependency.'
 
     doLast {
-        // 1. Validate and extract 'chart' argument (Mandatory)
-        if (!project.hasProperty('chart')) {
-            throw new GradleException("Missing required argument: -Pchart (e.g., -Pchart=aws)")
+        if (!project.hasProperty('chart') || !project.hasProperty('type')) {
+            throw new GradleException("Missing arguments. Usage: ./gradlew updateFileVersions -Pchart=default -Ptype=patch")
         }
-        def chartName = project.property('chart')
 
-        // 2. Validate and extract 'type' argument (Mandatory)
-        if (!project.hasProperty('type')) {
-            throw new GradleException("Missing required argument: -Ptype (e.g., -Ptype=patch, -Ptype=minor, -Ptype=major, -Ptype=alpha)")
-        }
+        def chartName = project.property('chart')
         def updateType = project.property('type')
 
-        // 3. Construct and verify file path
-        def chartPath = "helm/${chartName}/Chart.yaml"
-        def chartFile = file(chartPath)
+        def defaultPath = "helm/default/Chart.yaml"
+        def awsPath = "helm/aws/Chart.yaml"
 
-        if (!chartFile.exists()) {
-            throw new GradleException("The chart '${chartName}' does not exist at path: ${chartPath}")
+        if (chartName == 'default') {
+            println "==> Processing 'default' update and cascading to 'aws'..."
+            String newVersion = updateSingleChart(file(defaultPath), updateType)
+            updateAwsDependencyAndVersion(file(awsPath), newVersion)
+        } else {
+            def targetFile = file("helm/${chartName}/Chart.yaml")
+            if (!targetFile.exists()) throw new GradleException("Chart not found: ${targetFile.path}")
+            updateSingleChart(targetFile, updateType)
         }
-
-        // 4. Read and Parse Version
-        String content = chartFile.getText('UTF-8')
-        Matcher matcher = (content =~ '(?m)^version:\\s*(.*)')
-        
-        if (!matcher.find()) {
-            throw new GradleException("Could not find 'version:' line in ${chartPath}")
-        }
-
-        String oldVersion = matcher.group(1).trim()
-        String newVersion = calculateNewVersion(oldVersion, updateType)
-
-        println "==> [${chartName}] Updating ${oldVersion} -> ${newVersion} (${updateType})"
-
-        // 5. Update File Content
-        // Update top-level version
-        String newContent = content.replaceAll(/(?m)^version:\s*.*/, "version: ${newVersion}")
-        
-        // Update dependency version (chaining from newContent to preserve previous change)
-        newContent = newContent.replaceAll(/(?m)(name: default\s*.*?version:\s*).*?$/) { _, prefix ->
-            "${prefix}${newVersion}"
-        }
-
-        // 6. Write to file
-        chartFile.write(newContent, 'UTF-8')
-        println "==> Success! ${chartPath} updated."
     }
 }
 
-/**
- * Helper to handle the versioning logic
- */
+def updateSingleChart(File chartFile, String updateType) {
+    String content = chartFile.getText('UTF-8')
+    // Matches the top-level version only (ignores versions inside 'dependencies:')
+    Matcher matcher = (content =~ /(?m)^version:\s*(.*)/)
+    
+    if (!matcher.find()) throw new GradleException("Could not find top-level 'version:' in ${chartFile.path}")
+
+    String oldVersion = matcher.group(1).trim()
+    String newVersion = calculateNewVersion(oldVersion, updateType)
+
+    String newContent = content.replaceAll(/(?m)^version:\s*.*/, "version: ${newVersion}")
+    chartFile.write(newContent, 'UTF-8')
+    
+    println "==> [${chartFile.parentFile.name}] Main version updated: ${oldVersion} -> ${newVersion}"
+    return newVersion
+}
+
+def updateAwsDependencyAndVersion(File awsFile, String newVersion) {
+    if (!awsFile.exists()) return
+
+    String content = awsFile.getText('UTF-8')
+    
+    // 1. Update the top-level version of the AWS chart itself
+    String newContent = content.replaceAll(/(?m)^version:\s*.*/, "version: ${newVersion}")
+    
+    // 2. Update the dependency version for 'liferay-default'
+    // This regex looks for 'name: liferay-default' and the VERY NEXT 'version:' line that follows it.
+    newContent = newContent.replaceAll(/(?s)(name:\s*liferay-default.*?version:\s*)[^\n\r]*/) { _, prefix ->
+        "${prefix}${newVersion}"
+    }
+
+    awsFile.write(newContent, 'UTF-8')
+    println "==> [aws] Dependency 'liferay-default' synchronized to ${newVersion}"
+}
+
 def calculateNewVersion(String current, String type) {
-    // Strip alpha suffix if present to get the base semver (e.g., 1.0.0-abc -> 1.0.0)
     def baseVersion = current.split('-')[0]
     def parts = baseVersion.tokenize('.')
-    
-    if (parts.size() < 3) {
-        throw new GradleException("Version format in Chart.yaml is not MAJOR.MINOR.PATCH: ${current}")
-    }
+    if (parts.size() < 3) throw new GradleException("Invalid Version: ${current}")
 
     int major = parts[0].toInteger()
     int minor = parts[1].toInteger()
     int patch = parts[2].toInteger()
 
     switch (type.toLowerCase()) {
-        case 'major': 
-            return "${major + 1}.0.0"
-        case 'minor': 
-            return "${major}.${minor + 1}.0"
-        case 'patch': 
-            return "${major}.${minor}.${patch + 1}"
+        case 'major': return "${major + 1}.0.0"
+        case 'minor': return "${major}.${minor + 1}.0"
+        case 'patch': return "${major}.${minor}.${patch + 1}"
         case 'alpha':
             def hash = "alpha"
-            try {
-                // Attempts to get the 7-character git hash
-                hash = "git rev-parse --short HEAD".execute().text.trim()
-            } catch (Exception ignored) {
-                // Fallback if git is not installed or initialized
-            }
+            try { hash = "git rev-parse --short HEAD".execute().text.trim() ?: "alpha" } catch (e) {}
             return "${major}.${minor}.${patch}-${hash}"
         default:
-            throw new GradleException("Unknown update type: ${type}. Valid options: major, minor, patch, alpha.")
+            throw new GradleException("Unknown type: ${type}")
     }
 }
