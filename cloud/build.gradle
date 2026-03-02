@@ -1,0 +1,60 @@
+
+import java.util.regex.Matcher
+
+task updateFileVersions {
+    description = 'Updates the PATCH version in Chart.yaml files.'
+    doLast {
+        def defaultChartPath = 'helm/default/Chart.yaml'
+        def awsChartPath = 'helm/aws/Chart.yaml'
+
+        def defaultChartFile = file(defaultChartPath)
+        if (!defaultChartFile.exists()) {
+            throw new FileNotFoundException("File not found: ${defaultChartPath}")
+        }
+
+        def oldVersion
+        def newVersion
+
+        // 1. Read default chart, find current version, and calculate new version
+        String content = defaultChartFile.getText('UTF-8')
+        Matcher matcher = (content =~ '(?m)^version:\\s*(.*)')
+        if (matcher.find()) {
+            oldVersion = matcher.group(1).trim()
+            def versionParts = oldVersion.tokenize('.')
+            if (versionParts.size() != 3) {
+                throw new GradleException("Version format in ${defaultChartPath} is not MAJOR.MINOR.PATCH: ${oldVersion}")
+            }
+            def newPatch = versionParts[2].toInteger() + 1
+            newVersion = "${versionParts[0]}.${versionParts[1]}.${newPatch}"
+            println "==> Updating from version ${oldVersion} to ${newVersion}"
+        } else {
+            throw new GradleException("Could not find 'version:' in ${defaultChartPath}")
+        }
+
+        // 2. Update version in default/Chart.yaml
+        def newDefaultContent = content.replaceAll("version:\\s*${oldVersion}", "version: ${newVersion}")
+        defaultChartFile.write(newDefaultContent, 'UTF-8')
+        println "==> Updated version in ${defaultChartPath}"
+
+        // 3. Update versions in aws/Chart.yaml
+        def awsChartFile = file(awsChartPath)
+        if (!awsChartFile.exists()) {
+            throw new FileNotFoundException("File not found: ${awsChartPath}")
+        }
+
+        String awsContent = awsChartFile.getText('UTF-8')
+
+        // Update top-level version
+        String newAwsContent = awsContent.replaceAll("version:\\s*${oldVersion}", "version: ${newVersion}")
+
+        // Update dependency version
+        newAwsContent = newAwsContent.replaceAll("(?m)(name: default\\s*.*?version:\\s*)${oldVersion}", "\$1${newVersion}")
+
+        if (awsContent != newAwsContent) {
+            awsChartFile.write(newAwsContent, 'UTF-8')
+            println "==> Updated versions in ${awsChartPath}"
+        } else {
+             println "==> No version changes needed in ${awsChartPath}"
+        }
+    }
+}
