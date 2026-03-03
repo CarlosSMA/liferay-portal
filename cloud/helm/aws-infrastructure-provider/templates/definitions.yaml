@@ -110,7 +110,7 @@ spec:
                                                     default: OpenSearch_2.15
                                                     type: string
                                                 instanceCount:
-                                                    default: 2
+                                                    default: 3
                                                     type: integer
                                                 instanceType:
                                                     default: t3.small.search
