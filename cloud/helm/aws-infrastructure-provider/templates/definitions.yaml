@@ -106,6 +106,8 @@ spec:
                                     properties:
                                         opensearch:
                                             properties:
+                                                autoSoftwareUpdateEnabled:
+                                                    type: boolean
                                                 engineVersion:
                                                     default: OpenSearch_2.15
                                                     type: string

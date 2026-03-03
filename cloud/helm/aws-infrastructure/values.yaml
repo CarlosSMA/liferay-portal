@@ -23,6 +23,7 @@ license: {}
 overlay: {}
 search:
     opensearch:
+        autoSoftwareUpdateEnabled: true
         engineVersion: OpenSearch_2.15
         instanceCount: 1
         instanceType: t3.small.search
