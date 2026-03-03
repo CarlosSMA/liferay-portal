@@ -28,4 +28,5 @@ search:
         instanceCount: 1
         instanceType: t3.small.search
         username: liferay_search_admin
+        volumeSize: 20
 storage: {}
