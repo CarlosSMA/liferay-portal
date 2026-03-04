@@ -533,6 +533,7 @@ spec:
                                 backupRetentionPeriod: 7
                                 copyTagsToSnapshot: true
                                 dbName: lportal
+                                databaseInsightsMode: {{ $databaseSpec.databaseInsightsMode | quote }}
                                 dbSubnetGroupNameSelector:
                                     matchLabels:
                                         app: liferay
