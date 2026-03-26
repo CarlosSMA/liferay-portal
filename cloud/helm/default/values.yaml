@@ -83,6 +83,15 @@ customInitContainers:
                                 /temp/tomcat/temp \
                                 /temp/tomcat/work
 
+                            mkdir --parents /temp/liferay/osgi/configs /temp/system/scripts
+
+                            cp --verbose /staging-config/portal-cloud.properties /temp/liferay/portal-cloud.properties
+                            cp --verbose /staging-config/portal-ext.properties /temp/liferay/portal-ext.properties
+                            cp --verbose /staging-config/unicast.xml /temp/liferay/unicast.xml
+                            cp --verbose /staging-config/com.liferay.portal.k8s.agent.configuration.PortalK8sAgentConfiguration.config /temp/liferay/osgi/configs/com.liferay.portal.k8s.agent.configuration.PortalK8sAgentConfiguration.config
+                            cp --verbose /staging-config/000_jdk_java_options.sh /temp/system/scripts/000_jdk_java_options.sh
+                            cp --verbose /staging-config/010_install_prometheus_jmx_agent.sh /temp/system/scripts/010_install_prometheus_jmx_agent.sh
+
                             touch /temp/liferay/liferay.pid
 
                             if [ ! -d /temp/liferay/data ] || [ -z "$(ls --all /temp/liferay/data)" ]
@@ -152,6 +161,8 @@ customInitContainers:
                     volumeMounts:
                         -   mountPath: /temp
                             name: liferay-persistent-volume
+                        -   mountPath: /staging-config
+                            name: liferay-configmap
     x-liferay-wait-on-services:
         -   containerTemplate: |
                 -   command:
