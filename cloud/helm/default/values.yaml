@@ -387,8 +387,8 @@ volumeMounts:
         name: liferay-persistent-volume
         subPath: osgi/configs
     -   mountPath: /opt/liferay/osgi/configs/com.liferay.portal.k8s.agent.configuration.PortalK8sAgentConfiguration.config
-        name: liferay-configmap
-        subPath: com.liferay.portal.k8s.agent.configuration.PortalK8sAgentConfiguration.config
+        name: liferay-persistent-volume
+        subPath: liferay/osgi/configs/com.liferay.portal.k8s.agent.configuration.PortalK8sAgentConfiguration.config
     -   mountPath: /opt/liferay/osgi/modules
         name: liferay-persistent-volume
         subPath: osgi/modules
@@ -396,11 +396,11 @@ volumeMounts:
         name: liferay-persistent-volume
         subPath: osgi/state
     -   mountPath: /opt/liferay/portal-cloud.properties
-        name: liferay-configmap
-        subPath: portal-cloud.properties
+        name: liferay-persistent-volume
+        subPath: liferay/portal-cloud.properties
     -   mountPath: /opt/liferay/portal-ext.properties
-        name: liferay-configmap
-        subPath: portal-ext.properties
+        name: liferay-persistent-volume
+        subPath: liferay/portal-ext.properties
     -   mountPath: /opt/liferay/reports
         name: liferay-persistent-volume
         subPath: liferay/reports
@@ -423,8 +423,8 @@ volumeMounts:
         name: liferay-persistent-volume
         subPath: tomcat/work
     -   mountPath: /opt/liferay/unicast.xml
-        name: liferay-configmap
-        subPath: unicast.xml
+        name: liferay-persistent-volume
+        subPath: liferay/unicast.xml
     -   mountPath: /opt/liferay/work
         name: liferay-persistent-volume
         subPath: liferay/work
@@ -432,11 +432,11 @@ volumeMounts:
         name: liferay-persistent-volume
         subPath: system/tmp
     -   mountPath: /usr/local/liferay/scripts/pre-configure/000_jdk_java_options.sh
-        name: liferay-configmap
-        subPath: 000_jdk_java_options.sh
+        name: liferay-persistent-volume
+        subPath: system/scripts/000_jdk_java_options.sh
     -   mountPath: /usr/local/liferay/scripts/pre-configure/010_install_prometheus_jmx_agent.sh
-        name: liferay-configmap
-        subPath: 010_install_prometheus_jmx_agent.sh
+        name: liferay-persistent-volume
+        subPath: system/scripts/010_install_prometheus_jmx_agent.sh
 volumes:
     -   configMap:
             name: liferay-default
