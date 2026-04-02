@@ -15,6 +15,7 @@ autoscaling:
 configmap:
     annotations: {}
     data: {}
+    enableOpensearchConfig: false
     overrideDefaults: false
 customEnv: {}
 customEnvFrom: {}
