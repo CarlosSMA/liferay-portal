@@ -1,0 +1,57 @@
+resource "kubernetes_manifest" "argocd_sso_saml_external_secret" {
+	count=var.argocd_sso_enabled ? 1 : 0
+	depends_on=[
+		kubernetes_manifest.secret_store,
+	]
+	field_manager {
+		force_conflicts=true
+		name=local.terraform_manager_name
+	}
+	manifest={
+		apiVersion="external-secrets.io/v1"
+		kind="ExternalSecret"
+		metadata={
+			labels=local.common_labels
+			name="customer-idp-saml"
+			namespace=var.argocd_namespace
+		}
+		spec={
+			data=[
+				{
+					remoteRef={
+						key=var.argocd_sso_saml_config.credentials_secret_name
+						property=var.argocd_sso_saml_config.ca_data_property
+					}
+					secretKey="caData"
+				},
+				{
+					remoteRef={
+						key=var.argocd_sso_saml_config.credentials_secret_name
+						property=var.argocd_sso_saml_config.sso_url_property
+					}
+					secretKey="ssoURL"
+				},
+			]
+			refreshInterval="1h0m0s"
+			secretStoreRef={
+				kind="ClusterSecretStore"
+				name=local.secret_store_name
+			}
+			target={
+				creationPolicy="Owner"
+				name="customer-idp-saml"
+				template={
+					metadata={
+						labels=merge(
+							local.common_labels,
+							{
+								"app.kubernetes.io/name"="customer-idp-saml"
+								"app.kubernetes.io/part-of"="argocd"
+							})
+					}
+					type="Opaque"
+				}
+			}
+		}
+	}
+}
