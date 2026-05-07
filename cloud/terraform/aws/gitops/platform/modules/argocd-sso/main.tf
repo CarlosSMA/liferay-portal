@@ -1,5 +1,6 @@
 output "auth_sso_values" {
-	value=yamlencode({
+	value=compact([
+		yamlencode({
 		configs ={
 			cm={
 				"admin.enabled"=var.argocd_sso_config.enable_admin_login
@@ -36,5 +37,7 @@ output "auth_sso_values" {
 				"policy.default"="role:liferay-guest"
 			}
 		}
-	})
+		}),
+		var.argocd_sso_config.custom_values_yaml,
+	])
 }

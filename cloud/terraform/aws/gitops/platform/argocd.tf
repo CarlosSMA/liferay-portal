@@ -14,8 +14,8 @@ resource "helm_release" "argocd" {
 	name="argocd"
 	namespace=var.argocd_namespace
 	repository="https://argoproj.github.io/argo-helm"
-	values=[
-		yamlencode(
+	values=concat(
+		[yamlencode(
 			{
 				applicationSet={
 					resources={
@@ -152,9 +152,9 @@ resource "helm_release" "argocd" {
 						type="ClusterIP"
 					}
 				}
-			}),
-		var.argocd_sso_config.enable_sso ? module.argocd_sso[0].auth_sso_values : "{}",
-	]
+			})],
+		var.argocd_sso_config.enable_sso ? module.argocd_sso[0].auth_sso_values : [],
+	)
 	version=var.argocd_helm_chart_version
 	wait=true
 }
