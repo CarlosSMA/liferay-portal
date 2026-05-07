@@ -17,20 +17,19 @@ variable "argocd_namespace" {
 	default="argocd-system"
 	type=string
 }
-variable "argocd_sso_enabled" {
-	default=false
-	type=bool
-}
-variable "argocd_sso_saml_config" {
+variable "argocd_sso_config" {
 	default={}
 	type=object({
-		ca_data_property=optional(string, "caData")
-		credentials_secret_name=optional(string)
-		sso_url_property=optional(string, "ssoURL")
+		enable_sso=optional(bool, false)
+		saml_config=optional(object({
+			ca_data_property=optional(string, "caData")
+			credentials_secret_name=optional(string)
+			sso_url_property=optional(string, "ssoURL")
+		}), {})
 	})
 	validation {
-		condition=!var.argocd_sso_enabled || var.argocd_sso_saml_config.credentials_secret_name != null
-		error_message="The \"argocd_sso_saml_config.credentials_secret_name\" field must be set when \"argocd_sso_enabled\" is true."
+		condition=!var.argocd_sso_config.enable_sso || var.argocd_sso_config.saml_config.credentials_secret_name != null
+		error_message="The \"argocd_sso_config.saml_config.credentials_secret_name\" field must be set when \"argocd_sso_config.enable_sso\" is true."
 	}
 }
 variable "crossplane_namespace" {
