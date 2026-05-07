@@ -1,3 +1,14 @@
+variable "argocd_sso_config" {
+	default={}
+	type=object({
+		enable_admin_login=optional(bool, true)
+		enable_sso=optional(bool, false)
+		rbac=optional(object({
+			admins=list(string)
+		}), { admins=[] })
+		redirect_uri=optional(string)
+	})
+}
 variable "argo_workflows_helm_chart_version" {
 	type=string
 }
