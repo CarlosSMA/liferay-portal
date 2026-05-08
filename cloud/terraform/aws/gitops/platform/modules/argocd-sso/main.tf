@@ -3,7 +3,6 @@ output "auth_sso_values" {
 		yamlencode({
 		configs={
 			cm={
-				"admin.enabled"=var.argocd_sso_config.enable_admin_login
 				"dex.config"=yamlencode({
 					connectors =[{
 						type="saml"

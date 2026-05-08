@@ -24,6 +24,7 @@ resource "helm_release" "argocd" {
 				}
 				configs={
 					cm={
+						"admin.enabled"=var.argocd_sso_config.enable_admin_login
 						"application.resourceTrackingMethod"="annotation"
 						"controller.diff.timeout"="120s"
 						"kustomize.buildOptions"="--enable-helm"
@@ -187,6 +188,9 @@ resource "random_password" "argocd_server_secretkey" {
 	special=false
 }
 module "argocd_sso" {
-	argocd_sso_config=var.argocd_sso_config
+	argocd_sso_config={
+		custom_values_yaml=var.argocd_sso_config.custom_values_yaml
+		enable_sso=var.argocd_sso_config.enable_sso
+	}
 	source="./modules/argocd-sso"
 }
