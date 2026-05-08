@@ -20,7 +20,7 @@ variable "argocd_namespace" {
 variable "argocd_sso_config" {
 	default={}
 	type=object({
-    credentials_secret_name=optional(string, "liferay/credentials/argocd-sso")
+		credentials_secret_name=optional(string, "liferay/credentials/argocd-sso")
 		enable_sso=optional(bool, false)
 	})
 }
