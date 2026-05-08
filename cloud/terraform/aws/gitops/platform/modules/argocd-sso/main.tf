@@ -7,7 +7,7 @@ output "auth_sso_values" {
 					connectors =[{
 						type="saml"
 						id="customer-idp"
-						name="customer-idp"
+						name="SAML"
 						config={
 							caData="$customer-idp-saml:caData"
 							emailAttr="email"
