@@ -5,12 +5,6 @@ resource "helm_release" "argocd" {
 		kubernetes_namespace.argocd,
 		kubernetes_secret.argocd_secret,
 	]
-	lifecycle {
-		precondition {
-			condition=!var.argocd_sso_config.enable_sso || var.argocd_sso_config.redirect_uri != null
-			error_message="The \"argocd_sso_config.redirect_uri\" field must be set when \"argocd_sso_config.enable_sso\" is true."
-		}
-	}
 	name="argocd"
 	namespace=var.argocd_namespace
 	repository="https://argoproj.github.io/argo-helm"
