@@ -4,9 +4,7 @@ variable "argocd_sso_config" {
 		custom_values_yaml=optional(string)
 		enable_admin_login=optional(bool, true)
 		enable_sso=optional(bool, false)
-		rbac=optional(object({
-			admins=list(string)
-		}), { admins=[] })
+		entity_issuer=optional(string)
 		redirect_uri=optional(string)
 	})
 }

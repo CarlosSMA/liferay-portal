@@ -153,7 +153,7 @@ resource "helm_release" "argocd" {
 					}
 				}
 			})],
-		var.argocd_sso_config.enable_sso ? module.argocd_sso[0].auth_sso_values : [],
+		var.argocd_sso_config.enable_sso ? module.argocd_sso.auth_sso_values : [],
 	)
 	version=var.argocd_helm_chart_version
 	wait=true
@@ -194,6 +194,5 @@ resource "random_password" "argocd_server_secretkey" {
 }
 module "argocd_sso" {
 	argocd_sso_config=var.argocd_sso_config
-	count=var.argocd_sso_config.enable_sso ? 1 : 0
 	source="./modules/argocd-sso"
 }
