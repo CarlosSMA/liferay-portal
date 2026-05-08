@@ -19,29 +19,29 @@ resource "kubernetes_manifest" "argocd_sso_saml_external_secret" {
 			data=[
 				{
 					remoteRef={
-						key=var.argocd_sso_config.saml_config.credentials_secret_name
-						property=var.argocd_sso_config.saml_config.ca_data_property
+						key=var.argocd_sso_config.credentials_secret_name
+						property="caData"
 					}
 					secretKey="caData"
 				},
 				{
 					remoteRef={
-						key=var.argocd_sso_config.saml_config.credentials_secret_name
-						property=var.argocd_sso_config.saml_config.entity_issuer_property
+						key=var.argocd_sso_config.credentials_secret_name
+						property="entityIssuer"
 					}
 					secretKey="entityIssuer"
 				},
 				{
 					remoteRef={
-						key=var.argocd_sso_config.saml_config.credentials_secret_name
-						property=var.argocd_sso_config.saml_config.redirect_uri_property
+						key=var.argocd_sso_config.credentials_secret_name
+						property="redirectURI"
 					}
 					secretKey="redirectURI"
 				},
 				{
 					remoteRef={
-						key=var.argocd_sso_config.saml_config.credentials_secret_name
-						property=var.argocd_sso_config.saml_config.sso_url_property
+						key=var.argocd_sso_config.credentials_secret_name
+						property="ssoURL"
 					}
 					secretKey="ssoURL"
 				},

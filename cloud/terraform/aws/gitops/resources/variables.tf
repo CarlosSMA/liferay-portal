@@ -20,19 +20,9 @@ variable "argocd_namespace" {
 variable "argocd_sso_config" {
 	default={}
 	type=object({
+    credentials_secret_name=optional(string, "liferay/credentials/argocd-sso")
 		enable_sso=optional(bool, false)
-		saml_config=optional(object({
-			ca_data_property=optional(string, "caData")
-		  credentials_secret_name=optional(string, "liferay/credentials/argocd-sso")
-			entity_issuer_property=optional(string, "entityIssuer")
-			redirect_uri_property=optional(string, "redirectURI")
-			sso_url_property=optional(string, "ssoURL")
-		}), {})
 	})
-	validation {
-		condition=!var.argocd_sso_config.enable_sso || var.argocd_sso_config.saml_config.credentials_secret_name != null
-		error_message="The \"argocd_sso_config.saml_config.credentials_secret_name\" field must be set when \"argocd_sso_config.enable_sso\" is true."
-	}
 }
 variable "crossplane_namespace" {
 	default="crossplane-system"
