@@ -23,7 +23,7 @@ variable "argocd_sso_config" {
 		enable_sso=optional(bool, false)
 		saml_config=optional(object({
 			ca_data_property=optional(string, "caData")
-			credentials_secret_name=optional(string)
+		  credentials_secret_name=optional(string, "liferay/credentials/argocd-sso")
 			entity_issuer_property=optional(string, "entityIssuer")
 			redirect_uri_property=optional(string, "redirectURI")
 			sso_url_property=optional(string, "ssoURL")
