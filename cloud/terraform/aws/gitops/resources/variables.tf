@@ -24,6 +24,8 @@ variable "argocd_sso_config" {
 		saml_config=optional(object({
 			ca_data_property=optional(string, "caData")
 			credentials_secret_name=optional(string)
+			entity_issuer_property=optional(string, "entityIssuer")
+			redirect_uri_property=optional(string, "redirectURI")
 			sso_url_property=optional(string, "ssoURL")
 		}), {})
 	})

@@ -27,6 +27,20 @@ resource "kubernetes_manifest" "argocd_sso_saml_external_secret" {
 				{
 					remoteRef={
 						key=var.argocd_sso_config.saml_config.credentials_secret_name
+						property=var.argocd_sso_config.saml_config.entity_issuer_property
+					}
+					secretKey="entityIssuer"
+				},
+				{
+					remoteRef={
+						key=var.argocd_sso_config.saml_config.credentials_secret_name
+						property=var.argocd_sso_config.saml_config.redirect_uri_property
+					}
+					secretKey="redirectURI"
+				},
+				{
+					remoteRef={
+						key=var.argocd_sso_config.saml_config.credentials_secret_name
 						property=var.argocd_sso_config.saml_config.sso_url_property
 					}
 					secretKey="ssoURL"

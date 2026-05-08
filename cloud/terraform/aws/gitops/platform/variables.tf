@@ -4,8 +4,6 @@ variable "argocd_sso_config" {
 		custom_values_yaml=optional(string)
 		enable_admin_login=optional(bool, true)
 		enable_sso=optional(bool, false)
-		entity_issuer=optional(string)
-		redirect_uri=optional(string)
 	})
 }
 variable "argo_workflows_helm_chart_version" {

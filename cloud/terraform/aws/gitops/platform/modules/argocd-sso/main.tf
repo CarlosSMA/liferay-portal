@@ -12,9 +12,9 @@ output "auth_sso_values" {
 						config={
 							caData="$customer-idp-saml:caData"
 							emailAttr="email"
-							entityIssuer=var.argocd_sso_config.entity_issuer
+							entityIssuer="$customer-idp-saml:entityIssuer"
 							groupsAttr="groups"
-							redirectURI=var.argocd_sso_config.redirect_uri
+							redirectURI="$customer-idp-saml:redirectURI"
 							ssoURL="$customer-idp-saml:ssoURL"
 							usernameAttr="name"
 						}
