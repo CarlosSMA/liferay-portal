@@ -143,6 +143,8 @@ liferay-default:
         timeouts:
             backendRequest: 300s
             request: 300s
+    networkPolicy:
+        enabled: true
     overlay:
         copy: []
         enabled: false
