@@ -22,6 +22,7 @@ variable "deployment_name" {
 }
 variable "external_secret_store_provider_hcl" {
 	default=null
+	sensitive=true
 	type=any
 }
 variable "external_secrets_namespace" {

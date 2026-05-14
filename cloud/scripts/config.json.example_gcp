@@ -8,6 +8,8 @@
 	"variables": {
 		"deployment_name": "liferay-gcp-test",
 		"project_id": "your-gcp-project-id",
-		"region": "us-central1"
+		"region": "us-central1",
+		"tfstate_bucket_authorized_principals": [],
+		"tfstate_bucket_name": "liferay-gcp-test-tfstate"
 	}
 }

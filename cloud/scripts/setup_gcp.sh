@@ -43,12 +43,102 @@ function main {
 		bucket_name="$(jq --raw-output '.variables.tfstate_bucket_name' "${1}")"
 		region="$(jq --raw-output '.variables.region' "${1}")"
 
-		_create_tfstate_bucket "${bucket_name}" "${region}" "${_GCP_PROJECT_ID}"
+		_create_tfstate_bucket "${bucket_name}" "${region}" "${_GCP_PROJECT_ID}" "${1}"
 	fi
 
 	_set_up_gcp_gke "${bucket_name}" "${_GCP_DEPLOYMENT_NAME}" "${region}" "${terraform_args[@]}"
 
 	_set_up_gcp_gitops "${bucket_name}" "${_GCP_DEPLOYMENT_NAME}" "${region}" "${terraform_args[@]}"
+}
+
+function _apply_tfstate_iam_deny_policy {
+	local bucket_name="${1}"
+	local configuration_json_file="${2}"
+	local policy_id="deny-tfstate-readers"
+	local project_id="${3}"
+
+	local exception_principals_json
+
+	if jq --exit-status '(.variables.tfstate_bucket_authorized_principals | length) > 0' "${configuration_json_file}" &> /dev/null
+	then
+		exception_principals_json="$(jq --compact-output '.variables.tfstate_bucket_authorized_principals' "${configuration_json_file}")"
+	else
+		local active_account
+
+		active_account="$(gcloud auth list --filter=status:ACTIVE --format='value(account)' | head -n 1)"
+
+		if [ -z "${active_account}" ]
+		then
+			_log "Unable to determine the active gcloud account. Skipping IAM deny policy for bucket ${bucket_name}."
+
+			return 0
+		fi
+
+		exception_principals_json="$(jq --compact-output --null-input --arg account "${active_account}" '["principal://goog/subject/\($account)"]')"
+	fi
+
+	local service_agent
+
+	service_agent="$(gcloud storage service-agent --project "${project_id}")"
+
+	exception_principals_json="$(jq --compact-output --arg agent "${service_agent}" '. + ["principal://iam.googleapis.com/projects/-/serviceAccounts/\($agent)"]' <<< "${exception_principals_json}")"
+
+	local policy_file
+
+	policy_file="$(mktemp)"
+
+	jq --null-input \
+		--arg bucket "${bucket_name}" \
+		--argjson exception "${exception_principals_json}" \
+		'{
+			rules: [
+				{
+					denyRule: {
+						deniedPermissions: [
+							"storage.googleapis.com/objects.get",
+							"storage.googleapis.com/objects.getIamPolicy",
+							"storage.googleapis.com/objects.list"
+						],
+						deniedPrincipals: ["principalSet://goog/public:all"],
+						denialCondition: {
+							expression: "resource.name.startsWith(\"projects/_/buckets/\($bucket)\")"
+						},
+						exceptionPrincipals: $exception
+					}
+				}
+			]
+		}' > "${policy_file}"
+
+	local attachment_point="cloudresourcemanager.googleapis.com/projects/${project_id}"
+
+	if gcloud iam policies describe \
+		"${policy_id}" \
+		--attachment-point="${attachment_point}" \
+		--kind=denypolicies \
+		&> /dev/null
+	then
+		_log "Updating IAM deny policy ${policy_id}."
+
+		gcloud iam policies update \
+			"${policy_id}" \
+			--attachment-point="${attachment_point}" \
+			--kind=denypolicies \
+			--policy-file="${policy_file}" \
+			> /dev/null
+	else
+		_log "Creating IAM deny policy ${policy_id}."
+
+		gcloud iam policies create \
+			"${policy_id}" \
+			--attachment-point="${attachment_point}" \
+			--kind=denypolicies \
+			--policy-file="${policy_file}" \
+			> /dev/null
+	fi
+
+	rm -f "${policy_file}"
+
+	_log "IAM deny policy ${policy_id} applied to project ${project_id}."
 }
 
 function _configure_gcs_bucket {
@@ -118,6 +208,7 @@ function _configure_gcs_bucket {
 
 function _create_tfstate_bucket {
 	local bucket_name="${1}"
+	local configuration_json_file="${4}"
 	local project_id="${3}"
 	local region="${2}"
 
@@ -137,6 +228,8 @@ function _create_tfstate_bucket {
 	_configure_gcs_bucket "${bucket_name}" "${region}" "${project_id}"
 
 	_log "Bucket ${bucket_name} was configured successfully."
+
+	_apply_tfstate_iam_deny_policy "${bucket_name}" "${configuration_json_file}" "${project_id}"
 }
 
 function _create_gcs_bucket {
