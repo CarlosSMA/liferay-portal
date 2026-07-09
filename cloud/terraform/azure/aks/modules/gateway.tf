@@ -47,4 +47,7 @@ resource "kubernetes_pod_disruption_budget_v1" "envoy_proxy_pdb" {
 }
 resource "time_sleep" "cluster_ready_buffer" {
 	create_duration="30s"
+	triggers={
+		cluster_credentials_ready=var.cluster_credentials_ready
+	}
 }

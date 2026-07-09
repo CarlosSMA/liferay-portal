@@ -2,7 +2,7 @@ resource "azurerm_federated_identity_credential" "liferay" {
 	audience=["api://AzureADTokenExchange"]
 	issuer=azurerm_kubernetes_cluster.main.oidc_issuer_url
 	name="${var.deployment_name}-liferay-default"
-	parent_id=module.identity.workload_identity_id
+	parent_id=module.shared.workload_identity_id
 	resource_group_name=azurerm_resource_group.main.name
 	subject="system:serviceaccount:${var.deployment_namespace}:liferay-default"
 }
@@ -34,11 +34,10 @@ resource "azurerm_kubernetes_cluster" "main" {
 		only_critical_addons_enabled=true
 		temporary_name_for_rotation="systemtmp"
 		vm_size=var.system_node_vm_size
-		vnet_subnet_id=module.network.subnet_id
+		vnet_subnet_id=module.shared.subnet_id
 	}
 	depends_on=[
 		azurerm_role_assignment.cluster_network_contributor,
-		module.network,
 	]
 	dynamic "api_server_access_profile" {
 		content {

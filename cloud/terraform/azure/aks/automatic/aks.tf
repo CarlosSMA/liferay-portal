@@ -18,7 +18,7 @@ resource "azapi_resource" "main" {
 					mode="System"
 					name="systempool"
 					vmSize=var.system_node_vm_size
-					vnetSubnetID=module.network.subnet_id
+					vnetSubnetID=module.shared.subnet_id
 				}
 			]
 			apiServerAccessProfile={
@@ -35,9 +35,6 @@ resource "azapi_resource" "main" {
 			tier="Standard"
 		}
 	}
-	depends_on=[
-		module.network,
-	]
 	identity {
 		type="SystemAssigned"
 	}
@@ -53,7 +50,7 @@ resource "azurerm_federated_identity_credential" "liferay" {
 	audience=["api://AzureADTokenExchange"]
 	issuer=data.azurerm_kubernetes_cluster.main.oidc_issuer_url
 	name="${var.deployment_name}-liferay-default"
-	parent_id=module.identity.workload_identity_id
+	parent_id=module.shared.workload_identity_id
 	resource_group_name=azurerm_resource_group.main.name
 	subject="system:serviceaccount:${var.deployment_namespace}:liferay-default"
 }
@@ -66,5 +63,5 @@ resource "azurerm_role_assignment" "acr_pull" {
 resource "azurerm_role_assignment" "cluster_network_contributor" {
 	principal_id=azapi_resource.main.identity[0].principal_id
 	role_definition_name="Network Contributor"
-	scope=module.network.vnet_id
+	scope=module.shared.vnet_id
 }

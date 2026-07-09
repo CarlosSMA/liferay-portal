@@ -1,37 +1,18 @@
-module "gateway" {
-	depends_on=[
-		terraform_data.get_credentials,
-	]
+module "shared" {
+	cluster_credentials_ready=terraform_data.get_credentials.id
+	cluster_id=azapi_resource.main.id
+	deployment_name=var.deployment_name
 	envoy_gateway_helm_chart_version=var.envoy_gateway_helm_chart_version
 	gateway_namespace=var.gateway_namespace
-	source="../modules/gateway"
-}
-module "identity" {
-	deployment_name=var.deployment_name
 	location=var.location
+	observability_enabled=var.observability_config.enabled
+	observability_namespace=var.observability_config.namespace
+	oidc_issuer_url=data.azurerm_kubernetes_cluster.main.oidc_issuer_url
 	resource_group_name=azurerm_resource_group.main.name
-	source="../modules/identity"
+	source="../modules/shared"
 	storage_scopes=var.overlay_storage_account_ids
 	tags=local.tags
-}
-module "network" {
-	deployment_name=var.deployment_name
-	location=var.location
-	resource_group_name=azurerm_resource_group.main.name
-	source="../modules/network"
-	tags=local.tags
 	vnet_cidr=var.vnet_cidr
-}
-module "observability" {
-	cluster_id=azapi_resource.main.id
-	count=var.observability_config.enabled ? 1 : 0
-	deployment_name=var.deployment_name
-	location=var.location
-	oidc_issuer_url=data.azurerm_kubernetes_cluster.main.oidc_issuer_url
-	observability_namespace=var.observability_config.namespace
-	resource_group_name=azurerm_resource_group.main.name
-	source="../modules/observability"
-	tags=local.tags
 }
 resource "azurerm_resource_group" "main" {
 	location=var.location
