@@ -1,0 +1,62 @@
+locals {
+	subnet_cidr=cidrsubnet(var.vnet_cidr, 4, 0)
+}
+resource "azurerm_nat_gateway" "main" {
+	location=var.location
+	name="${var.deployment_name}-nat"
+	resource_group_name=var.resource_group_name
+	sku_name="Standard"
+	tags=var.tags
+}
+resource "azurerm_nat_gateway_public_ip_association" "main" {
+	nat_gateway_id=azurerm_nat_gateway.main.id
+	public_ip_address_id=azurerm_public_ip.nat.id
+}
+resource "azurerm_network_security_group" "main" {
+	location=var.location
+	name="${var.deployment_name}-nsg"
+	resource_group_name=var.resource_group_name
+	tags=var.tags
+}
+resource "azurerm_network_security_rule" "envoy_ingress" {
+	access="Allow"
+	destination_address_prefix="*"
+	destination_port_ranges=["10080", "10443"]
+	direction="Inbound"
+	name="${var.deployment_name}-allow-envoy-ingress"
+	network_security_group_name=azurerm_network_security_group.main.name
+	priority=1000
+	protocol="Tcp"
+	resource_group_name=var.resource_group_name
+	source_address_prefix=var.vnet_cidr
+	source_port_range="*"
+}
+resource "azurerm_public_ip" "nat" {
+	allocation_method="Static"
+	location=var.location
+	name="${var.deployment_name}-nat-ip"
+	resource_group_name=var.resource_group_name
+	sku="Standard"
+	tags=var.tags
+}
+resource "azurerm_subnet" "main" {
+	address_prefixes=[local.subnet_cidr]
+	name="${var.deployment_name}-subnet"
+	resource_group_name=var.resource_group_name
+	virtual_network_name=azurerm_virtual_network.main.name
+}
+resource "azurerm_subnet_nat_gateway_association" "main" {
+	nat_gateway_id=azurerm_nat_gateway.main.id
+	subnet_id=azurerm_subnet.main.id
+}
+resource "azurerm_subnet_network_security_group_association" "main" {
+	network_security_group_id=azurerm_network_security_group.main.id
+	subnet_id=azurerm_subnet.main.id
+}
+resource "azurerm_virtual_network" "main" {
+	address_space=[var.vnet_cidr]
+	location=var.location
+	name="${var.deployment_name}-vnet"
+	resource_group_name=var.resource_group_name
+	tags=var.tags
+}
