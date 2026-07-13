@@ -16,15 +16,16 @@ variable "deployment_namespace" {
 	default="liferay-system"
 	description="Kubernetes namespace whose liferay-default service account is federated to the workload identity."
 	type=string
+	validation {
+		condition=can(regex("^[a-z0-9-]*$", var.deployment_namespace))
+		error_message="The deployment_namespace must contain only lowercase letters, numbers, and hyphens."
+	}
 }
 variable "envoy_gateway_helm_chart_version" {
 	type=string
 }
 variable "gateway_namespace" {
 	default="envoy-gateway-system"
-	type=string
-}
-variable "location" {
 	type=string
 }
 variable "observability_config" {
@@ -43,16 +44,19 @@ variable "private_cluster" {
 	default=true
 	type=bool
 }
+variable "region" {
+	type=string
+}
 variable "system_node_count" {
 	default=3
 	description="Node count for the Automatic system pool. Node Auto Provisioning handles workload nodes."
 	type=number
 }
-variable "system_node_vm_size" {
+variable "machine_type" {
 	default="Standard_D4s_v5"
 	type=string
 }
-variable "vnet_cidr" {
+variable "vpc_cidr" {
 	default="10.0.0.0/16"
 	type=string
 }

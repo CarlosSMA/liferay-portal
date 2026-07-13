@@ -1,8 +1,8 @@
 locals {
-	subnet_cidr=cidrsubnet(var.vnet_cidr, 4, 0)
+	subnet_cidr=cidrsubnet(var.vpc_cidr, 4, 0)
 }
 resource "azurerm_nat_gateway" "main" {
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-nat"
 	resource_group_name=var.resource_group_name
 	sku_name="Standard"
@@ -13,7 +13,7 @@ resource "azurerm_nat_gateway_public_ip_association" "main" {
 	public_ip_address_id=azurerm_public_ip.nat.id
 }
 resource "azurerm_network_security_group" "main" {
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-nsg"
 	resource_group_name=var.resource_group_name
 	tags=var.tags
@@ -28,12 +28,12 @@ resource "azurerm_network_security_rule" "envoy_ingress" {
 	priority=1000
 	protocol="Tcp"
 	resource_group_name=var.resource_group_name
-	source_address_prefix=var.vnet_cidr
+	source_address_prefix=var.vpc_cidr
 	source_port_range="*"
 }
 resource "azurerm_public_ip" "nat" {
 	allocation_method="Static"
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-nat-ip"
 	resource_group_name=var.resource_group_name
 	sku="Standard"
@@ -54,8 +54,8 @@ resource "azurerm_subnet_network_security_group_association" "main" {
 	subnet_id=azurerm_subnet.main.id
 }
 resource "azurerm_virtual_network" "main" {
-	address_space=[var.vnet_cidr]
-	location=var.location
+	address_space=[var.vpc_cidr]
+	location=var.region
 	name="${var.deployment_name}-vnet"
 	resource_group_name=var.resource_group_name
 	tags=var.tags

@@ -10,9 +10,6 @@ output "gateway_namespace" {
 output "kubelet_identity_object_id" {
 	value=data.azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
 }
-output "location" {
-	value=var.location
-}
 output "monitor_workspace_id" {
 	value=module.shared.monitor_workspace_id
 }
@@ -24,6 +21,9 @@ output "oidc_issuer_url" {
 }
 output "private_subnet_ids" {
 	value=[module.shared.subnet_id]
+}
+output "region" {
+	value=var.region
 }
 output "resource_group_name" {
 	value=azurerm_resource_group.main.name

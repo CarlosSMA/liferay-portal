@@ -17,7 +17,7 @@ resource "azapi_resource" "main" {
 					count=var.system_node_count
 					mode="System"
 					name="systempool"
-					vmSize=var.system_node_vm_size
+					vmSize=var.machine_type
 					vnetSubnetID=module.shared.subnet_id
 				}
 			]
@@ -38,7 +38,7 @@ resource "azapi_resource" "main" {
 	identity {
 		type="SystemAssigned"
 	}
-	location=var.location
+	location=var.region
 	name=local.cluster_name
 	parent_id=azurerm_resource_group.main.id
 	response_export_values=["properties.oidcIssuerProfile.issuerURL"]

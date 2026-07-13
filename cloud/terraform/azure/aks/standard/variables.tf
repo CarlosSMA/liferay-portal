@@ -21,6 +21,10 @@ variable "deployment_namespace" {
 	default="liferay-system"
 	description="Kubernetes namespace whose liferay-default service account is federated to the workload identity."
 	type=string
+	validation {
+		condition=can(regex("^[a-z0-9-]*$", var.deployment_namespace))
+		error_message="The deployment_namespace must contain only lowercase letters, numbers, and hyphens."
+	}
 }
 variable "dns_service_ip" {
 	default="10.245.0.10"
@@ -31,9 +35,6 @@ variable "envoy_gateway_helm_chart_version" {
 }
 variable "gateway_namespace" {
 	default="envoy-gateway-system"
-	type=string
-}
-variable "location" {
 	type=string
 }
 variable "max_node_count" {
@@ -58,23 +59,26 @@ variable "overlay_storage_account_ids" {
 }
 variable "pod_cidr" {
 	default="10.244.0.0/16"
-	description="Overlay pod CIDR. Must not overlap vnet_cidr or service_cidr."
+	description="Overlay pod CIDR. Must not overlap vpc_cidr or service_cidr."
 	type=string
 }
 variable "private_cluster" {
 	default=true
 	type=bool
 }
-variable "service_cidr" {
-	default="10.245.0.0/16"
-	description="Service CIDR. Must not overlap vnet_cidr or pod_cidr."
+variable "region" {
 	type=string
 }
-variable "system_node_vm_size" {
+variable "service_cidr" {
+	default="10.245.0.0/16"
+	description="Service CIDR. Must not overlap vpc_cidr or pod_cidr."
+	type=string
+}
+variable "machine_type" {
 	default="Standard_D4s_v5"
 	type=string
 }
-variable "vnet_cidr" {
+variable "vpc_cidr" {
 	default="10.0.0.0/16"
 	type=string
 }

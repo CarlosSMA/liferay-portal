@@ -17,9 +17,6 @@ variable "gateway_namespace" {
 	default="envoy-gateway-system"
 	type=string
 }
-variable "location" {
-	type=string
-}
 variable "observability_enabled" {
 	default=false
 	description="Provisions the Azure Monitor workspace and observability workload identities when true."
@@ -31,6 +28,9 @@ variable "observability_namespace" {
 }
 variable "oidc_issuer_url" {
 	description="The cluster OIDC issuer URL used to federate the observability workload identities."
+	type=string
+}
+variable "region" {
 	type=string
 }
 variable "resource_group_name" {
@@ -45,7 +45,7 @@ variable "tags" {
 	default={}
 	type=map(string)
 }
-variable "vnet_cidr" {
+variable "vpc_cidr" {
 	default="10.0.0.0/16"
 	type=string
 }

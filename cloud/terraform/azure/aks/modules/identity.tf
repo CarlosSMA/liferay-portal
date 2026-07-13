@@ -5,7 +5,7 @@ resource "azurerm_role_assignment" "workload_storage" {
 	scope=each.value
 }
 resource "azurerm_user_assigned_identity" "workload" {
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-workload-identity"
 	resource_group_name=var.resource_group_name
 	tags=var.tags

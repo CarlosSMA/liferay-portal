@@ -13,7 +13,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 	image_cleaner_enabled=true
 	kubernetes_version=data.azurerm_kubernetes_service_versions.current.latest_version
 	local_account_disabled=true
-	location=var.location
+	location=var.region
 	name=local.cluster_name
 	node_os_upgrade_channel="NodeImage"
 	oidc_issuer_enabled=true
@@ -33,7 +33,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 		name="system"
 		only_critical_addons_enabled=true
 		temporary_name_for_rotation="systemtmp"
-		vm_size=var.system_node_vm_size
+		vm_size=var.machine_type
 		vnet_subnet_id=module.shared.subnet_id
 	}
 	depends_on=[

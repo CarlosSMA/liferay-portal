@@ -28,7 +28,7 @@ resource "azurerm_federated_identity_credential" "observability" {
 resource "azurerm_monitor_data_collection_endpoint" "prometheus" {
 	count=var.observability_enabled ? 1 : 0
 	kind="Linux"
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-prometheus-dce"
 	resource_group_name=var.resource_group_name
 	tags=var.tags
@@ -53,7 +53,7 @@ resource "azurerm_monitor_data_collection_rule" "prometheus" {
 		}
 	}
 	kind="Linux"
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-prometheus-dcr"
 	resource_group_name=var.resource_group_name
 	tags=var.tags
@@ -66,7 +66,7 @@ resource "azurerm_monitor_data_collection_rule_association" "prometheus" {
 }
 resource "azurerm_monitor_workspace" "prometheus" {
 	count=var.observability_enabled ? 1 : 0
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-prometheus"
 	resource_group_name=var.resource_group_name
 	tags=var.tags
@@ -79,7 +79,7 @@ resource "azurerm_role_assignment" "observability" {
 }
 resource "azurerm_user_assigned_identity" "observability" {
 	for_each=local.observability_service_accounts
-	location=var.location
+	location=var.region
 	name="${var.deployment_name}-${each.key}"
 	resource_group_name=var.resource_group_name
 	tags=var.tags
