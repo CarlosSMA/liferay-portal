@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {useProvider} from '@clayui/provider';
 import {useEffect, useRef} from 'react';
 
 interface IProps {
@@ -11,6 +12,8 @@ interface IProps {
 }
 
 export function useAutoClose({autoClose, onClose}: IProps) {
+	const {persistentAlerts} = useProvider();
+
 	const elapsedRef = useRef(0);
 	const expiredRef = useRef(false);
 	const startedAtRef = useRef<number>(0);
@@ -30,7 +33,12 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 	};
 
 	const startTimer = () => {
-		if (!autoClose || expiredRef.current || timerRef.current) {
+		if (
+			!autoClose ||
+			persistentAlerts ||
+			expiredRef.current ||
+			timerRef.current
+		) {
 			return;
 		}
 
@@ -53,7 +61,7 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 		startTimer();
 
 		return pauseTimer;
-	}, []);
+	}, [persistentAlerts]);
 
 	return {
 		pauseAutoCloseTimer: pauseTimer,
