@@ -11,6 +11,7 @@ interface IProps {
 }
 
 export function useAutoClose({autoClose, onClose}: IProps) {
+	const expiredRef = useRef(false);
 	const remainingTimeRef = useRef(
 		autoClose === true ? 10000 : autoClose || 0
 	);
@@ -31,16 +32,18 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 	};
 
 	const startTimer = () => {
-		if (!autoClose || timerRef.current) {
+		if (!autoClose || expiredRef.current || timerRef.current) {
 			return;
 		}
 
 		startedAtRef.current = Date.now();
 
-		timerRef.current = window.setTimeout(
-			() => onClose?.(),
-			remainingTimeRef.current
-		);
+		timerRef.current = window.setTimeout(() => {
+			expiredRef.current = true;
+			timerRef.current = null;
+
+			onClose?.();
+		}, remainingTimeRef.current);
 	};
 
 	useEffect(() => {
