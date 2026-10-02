@@ -31,7 +31,7 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 	};
 
 	const startTimer = () => {
-		if (!autoClose) {
+		if (!autoClose || timerRef.current) {
 			return;
 		}
 
