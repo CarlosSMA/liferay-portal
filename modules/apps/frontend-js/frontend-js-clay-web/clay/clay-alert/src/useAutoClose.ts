@@ -3,38 +3,50 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import React from 'react';
+import {useEffect, useRef} from 'react';
 
-export function useAutoClose(autoClose?: boolean | number, onClose = () => {}) {
-	const startedTimeRef = React.useRef<number>(0);
-	const timerRef = React.useRef<number | undefined>(undefined);
-	const timeToCloseRef = React.useRef(autoClose === true ? 10000 : autoClose);
-	let pauseTimer = () => {};
-	let startTimer = () => {};
-	if (autoClose) {
-		pauseTimer = () => {
-			if (timerRef.current) {
-				timeToCloseRef.current =
-					(timeToCloseRef.current as number) -
-					(Date.now() - startedTimeRef.current);
-				clearTimeout(timerRef.current);
-				timerRef.current = undefined;
-			}
-		};
-		startTimer = () => {
-			startedTimeRef.current = Date.now();
-			timerRef.current = window.setTimeout(
-				onClose,
-				timeToCloseRef.current as number
-			);
-		};
-	}
-	React.useEffect(() => {
-		if (autoClose) {
-			startTimer();
+interface IProps {
+	autoClose?: boolean | number;
+	onClose?: () => void;
+}
 
-			return pauseTimer;
+export function useAutoClose({autoClose, onClose}: IProps) {
+	const remainingTimeRef = useRef(
+		autoClose === true ? 10000 : autoClose || 0
+	);
+	const startedAtRef = useRef<number>(0);
+	const timerRef = useRef<number | null>(null);
+
+	const pauseTimer = () => {
+		if (!timerRef.current) {
+			return;
 		}
+
+		remainingTimeRef.current =
+			remainingTimeRef.current - (Date.now() - startedAtRef.current);
+
+		clearTimeout(timerRef.current);
+
+		timerRef.current = null;
+	};
+
+	const startTimer = () => {
+		if (!autoClose) {
+			return;
+		}
+
+		startedAtRef.current = Date.now();
+
+		timerRef.current = window.setTimeout(
+			() => onClose?.(),
+			remainingTimeRef.current
+		);
+	};
+
+	useEffect(() => {
+		startTimer();
+
+		return pauseTimer;
 	}, []);
 
 	return {

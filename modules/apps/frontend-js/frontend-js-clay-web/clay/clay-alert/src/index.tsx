@@ -113,10 +113,10 @@ function ClayAlert({
 	variant,
 	...otherProps
 }: IClayAlertProps) {
-	const {pauseAutoCloseTimer, startAutoCloseTimer} = useAutoClose(
+	const {pauseAutoCloseTimer, startAutoCloseTimer} = useAutoClose({
 		autoClose,
-		onClose
-	);
+		onClose,
+	});
 	const ConditionalContainer = ({children}: any) =>
 		variant === 'stripe' ? (
 			<div className={classNames('container', containerClassName)}>
