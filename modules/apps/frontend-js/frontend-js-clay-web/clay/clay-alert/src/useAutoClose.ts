@@ -4,7 +4,7 @@
  */
 
 import {useProvider} from '@clayui/provider';
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 interface IProps {
 	autoClose?: boolean | number;
@@ -16,11 +16,12 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 
 	const elapsedRef = useRef(0);
 	const expiredRef = useRef(false);
+	const onCloseRef = useRef(onClose);
 	const pauseRequestedRef = useRef(false);
 	const startedAtRef = useRef<number>(0);
 	const timerRef = useRef<number | null>(null);
 
-	const pauseTimer = () => {
+	const pauseTimer = useCallback(() => {
 		if (!timerRef.current) {
 			return;
 		}
@@ -31,9 +32,9 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 		clearTimeout(timerRef.current);
 
 		timerRef.current = null;
-	};
+	}, []);
 
-	const startTimer = () => {
+	const startTimer = useCallback(() => {
 		if (
 			!autoClose ||
 			persistentAlerts ||
@@ -53,17 +54,21 @@ export function useAutoClose({autoClose, onClose}: IProps) {
 				expiredRef.current = true;
 				timerRef.current = null;
 
-				onClose?.();
+				onCloseRef.current?.();
 			},
 			Math.max(0, autoCloseDuration - elapsedRef.current)
 		);
-	};
+	}, [autoClose, persistentAlerts]);
+
+	useEffect(() => {
+		onCloseRef.current = onClose;
+	}, [onClose]);
 
 	useEffect(() => {
 		startTimer();
 
 		return pauseTimer;
-	}, [autoClose, persistentAlerts]);
+	}, [pauseTimer, startTimer]);
 
 	return {
 		pauseAutoCloseTimer: () => {
