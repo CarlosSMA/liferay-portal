@@ -6,13 +6,22 @@
 import {useProvider} from '@clayui/provider';
 import {useCallback, useEffect, useRef} from 'react';
 
+import {useBodyHasClass} from './useBodyHasClass';
+
 interface IProps {
 	autoClose?: boolean | number;
 	onClose?: () => void;
 }
 
 export function useAutoClose({autoClose, onClose}: IProps) {
-	const {persistentAlerts} = useProvider();
+	const {persistentAlerts: providerPersistentAlerts} = useProvider();
+
+	const prefersPersistentAlerts = useBodyHasClass(
+		'c-prefers-persistent-alerts'
+	);
+
+	const persistentAlerts =
+		providerPersistentAlerts || prefersPersistentAlerts;
 
 	const elapsedRef = useRef(0);
 	const expiredRef = useRef(false);
