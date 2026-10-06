@@ -13,7 +13,7 @@ Create a GitHub PR for the current branch, transition the linked Jira tickets to
 
 ## Repository Settings
 
-The base branch is `master` in `liferay/liferay-portal` and `master-private` in `liferay/liferay-portal-ee`. Use the one for the repository that a remote of this checkout points at (check `git remote --verbose`).
+The base branch is `master` in `liferay/liferay-portal` and `master-private` in `liferay/liferay-portal-ee`. Use the base branch of the repository that a remote of this checkout points at (check `git remote --verbose`).
 
 Below, `${BASE_BRANCH}` stands for that base branch, and `<repository>` stands for that repository without its organization, such as `liferay-portal`.
 
@@ -41,7 +41,7 @@ Collect every distinct ticket key from the subjects of the branch's commits rela
 
 ### Target Repository
 
-The target repository defaults to `<fork-owner>/<repository>`. When `${ARGUMENTS}` names a different `org/repo`, use that; when it matches an alias below, expand the alias; otherwise, ask the user to choose `<fork-owner>` from the teams below, leaving out any that has no fork of `<repository>`:
+The target repository defaults to `<fork-owner>/<repository>`. When `${ARGUMENTS}` names a different `org/repo`, use that; when it matches an alias below, expand the alias; otherwise, ask the user to choose `<fork-owner>` from the teams below, leaving out any team that has no fork of `<repository>`:
 
 - `liferay-ac`
 - `liferay-appsec`

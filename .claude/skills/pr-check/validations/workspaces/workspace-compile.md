@@ -23,7 +23,7 @@ fi
 
 `assemble` compiles every module and builds its jar, runs the JavaScript build, and builds every client extension, which runs `validateClientExtensions` and `validateClientExtensionIds`. `testIntegrationClasses` compiles the integration test sources without running them, so a change that breaks an integration test's call site fails here rather than in CI's `workspaces-integration` batch. Neither pulls in a unit test, an integration test run, or the product bundle.
 
-`testIntegrationClasses` exists only in a workspace with integration test sources. Naming a task Gradle cannot find fails the whole command before anything compiles, so the command names it only in such a workspace.
+`testIntegrationClasses` exists only in a workspace with integration test sources. Naming a task that Gradle cannot find fails the whole command before anything compiles, so the command names it only in such a workspace.
 
 `--continue` keeps one broken module from hiding the rest, since Gradle otherwise stops at the first failed task.
 

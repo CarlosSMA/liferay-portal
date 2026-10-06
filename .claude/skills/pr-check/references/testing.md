@@ -20,4 +20,4 @@ Run `/pr-check` from the root of a worktree that holds the planted changes, for 
 
 A branch in this repository always carries the rule change in its own diff, so a test run here also reports on the `.claude` files the change touched. That is expected.
 
-To test the rules as the private repository runs them, copy `pr`, `pr-check`, and `pr-check-publish` from the branch holding the change into a worktree of `liferay-portal-ee` on `master-private`. The copies do not come from local `master`, so give the rules commit in the prompt.
+To test the rules as the private repository runs them, copy `pr`, `pr-check`, and `pr-check-publish` from the branch holding the change into a worktree of `liferay-portal-ee` on `master-private`. The copies do not come from local `master`, so name the rules commit in the prompt.
