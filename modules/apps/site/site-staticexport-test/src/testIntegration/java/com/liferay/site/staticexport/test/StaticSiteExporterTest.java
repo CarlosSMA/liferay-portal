@@ -154,7 +154,7 @@ public class StaticSiteExporterTest {
 	}
 
 	@Test
-	public void testExportWithURLFragment() throws Exception {
+	public void testExportWithURIFragment() throws Exception {
 		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
 
 		Layout draftLayout = layout.fetchDraftLayout();
