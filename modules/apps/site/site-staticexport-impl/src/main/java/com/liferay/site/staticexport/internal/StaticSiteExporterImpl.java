@@ -225,6 +225,9 @@ public class StaticSiteExporterImpl implements StaticSiteExporter {
 		List<StaticSiteExportResource> staticSiteExportResources =
 			new ArrayList<>();
 
+		Set<String> fetchedURLs = new HashSet<>();
+		Set<String> moduleNames = new HashSet<>();
+
 		StaticSiteExportBundleResourceResolver
 			staticSiteExportBundleResourceResolver =
 				new StaticSiteExportBundleResourceResolver(_bundleContext);
@@ -234,9 +237,6 @@ public class StaticSiteExporterImpl implements StaticSiteExporter {
 				httpServletRequest, new DummyHttpServletResponse(), portalURL,
 				ServletContextPool.get(_portal.getServletContextName()),
 				staticSiteExportBundleResourceResolver);
-
-		Set<String> fetchedURLs = new HashSet<>();
-		Set<String> moduleNames = new HashSet<>();
 
 		for (StaticSiteExportDocument staticSiteExportDocument :
 				staticSiteExportDocuments) {
@@ -532,15 +532,15 @@ public class StaticSiteExporterImpl implements StaticSiteExporter {
 	}
 
 	private boolean _hasScheme(String url) {
-		int index = url.indexOf(CharPool.COLON);
+		int colonIndex = url.indexOf(CharPool.COLON);
 
-		if (index == -1) {
+		if (colonIndex == -1) {
 			return false;
 		}
 
 		int slashIndex = url.indexOf(CharPool.SLASH);
 
-		if ((slashIndex == -1) || (index < slashIndex)) {
+		if ((slashIndex == -1) || (colonIndex < slashIndex)) {
 			return true;
 		}
 
