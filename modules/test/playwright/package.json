@@ -1,7 +1,6 @@
 {
 	"author": "",
 	"dependencies": {
-		"form-data": "4.0.5",
 		"moment": "2.29.4",
 		"yauzl": "3.2.1"
 	},
