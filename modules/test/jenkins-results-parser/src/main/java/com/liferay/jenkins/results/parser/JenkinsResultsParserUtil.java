@@ -809,7 +809,7 @@ public class JenkinsResultsParserUtil {
 			return null;
 		}
 
-		String script;
+		String script = null;
 
 		Class<?> clazz = JenkinsResultsParserUtil.class;
 
