@@ -61,7 +61,6 @@ public class OpenSearchIndexWriterExceptionsTest extends BaseIndexingTestCase {
 		super.setUp();
 
 		String indexName = String.valueOf(_COMPANY_ID);
-
 		SearchEngineAdapter searchEngineAdapter = getSearchEngineAdapter();
 
 		IndicesExistsIndexResponse indicesExistsIndexResponse =
@@ -402,8 +401,8 @@ public class OpenSearchIndexWriterExceptionsTest extends BaseIndexingTestCase {
 
 		ErrorCause errorCause = openSearchException.error();
 
-		Assert.assertEquals(expectedType, errorCause.type());
 		consumer.accept(errorCause.reason());
+		Assert.assertEquals(expectedType, errorCause.type());
 	}
 
 	private static final long _COMPANY_ID = 1;
