@@ -575,6 +575,9 @@ public class AssetStatisticsResourceTest
 	}
 
 	private void _testGetAssetStatisticsWorkflowTasksCounts() throws Exception {
+
+		// Add object entry with completed workflow task past its due date
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext();
 
@@ -594,8 +597,6 @@ public class AssetStatisticsResourceTest
 		}
 
 		Date date = new Date();
-
-		// Add object entry with completed workflow task past its due date
 
 		_updateKaleoTaskInstanceToken(
 			true, new Date(date.getTime() - Time.DAY), objectDefinition,

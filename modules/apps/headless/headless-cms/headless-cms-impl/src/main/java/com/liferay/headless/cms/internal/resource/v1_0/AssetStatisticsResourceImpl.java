@@ -85,10 +85,9 @@ public class AssetStatisticsResourceImpl
 			return _toAssetStatistics();
 		}
 
-		Date date = new Date();
-
 		String[] classNames = transformToArray(
 			objectDefinitions, ObjectDefinition::getClassName, String.class);
+		Date date = new Date();
 
 		return new AssetStatistics() {
 			{
