@@ -517,6 +517,14 @@ public abstract class BaseBatchEnginePortletDataHandlerTestCase
 		return _targetUser;
 	}
 
+	@Override
+	protected void initContext() throws Exception {
+		super.initContext();
+
+		portletDataContext.setGroupId(_group.getGroupId());
+		portletDataContext.setScopeGroupId(_group.getGroupId());
+	}
+
 	protected abstract boolean supportsComments();
 
 	protected abstract boolean supportsEmptyEntries();
