@@ -246,6 +246,33 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 				)
 			),
 			urlReader);
+	}
+
+	@Test
+	public void testFetchQueueItemFailure() throws Exception {
+		UrlReader urlReader = mockUrlReader();
+
+		long queueId = _getQueueId();
+
+		String queueItemAPIURL = _getQueueItemAPIURL(queueId);
+
+		IOException ioException1 = new IOException(
+			RandomTestUtil.randomString());
+
+		setUrlReaderException(ioException1, queueItemAPIURL, urlReader);
+
+		IOException ioException2 = Assert.assertThrows(
+			IOException.class, () -> _jenkinsMaster.fetchQueueItem(queueId));
+
+		Assert.assertEquals(
+			ioException1.getMessage(), ioException2.getMessage());
+
+		Assert.assertNull(_jenkinsMaster.getQueueItem(queueId));
+	}
+
+	@Test
+	public void testFetchQueueItemNotFound() throws Exception {
+		UrlReader urlReader = mockUrlReader();
 
 		long queueId = _getQueueId();
 
@@ -277,28 +304,6 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 			urlReader);
 
 		Assert.assertNull(_jenkinsMaster.fetchQueueItem(queueId));
-	}
-
-	@Test
-	public void testFetchQueueItemFailure() throws Exception {
-		UrlReader urlReader = mockUrlReader();
-
-		long queueId = _getQueueId();
-
-		String queueItemAPIURL = _getQueueItemAPIURL(queueId);
-
-		IOException ioException1 = new IOException(
-			RandomTestUtil.randomString());
-
-		setUrlReaderException(ioException1, queueItemAPIURL, urlReader);
-
-		IOException ioException2 = Assert.assertThrows(
-			IOException.class, () -> _jenkinsMaster.fetchQueueItem(queueId));
-
-		Assert.assertEquals(
-			ioException1.getMessage(), ioException2.getMessage());
-
-		Assert.assertNull(_jenkinsMaster.getQueueItem(queueId));
 	}
 
 	@Test

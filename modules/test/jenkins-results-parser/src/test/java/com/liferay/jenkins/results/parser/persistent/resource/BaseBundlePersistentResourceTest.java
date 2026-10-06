@@ -47,7 +47,7 @@ public class BaseBundlePersistentResourceTest
 	public void testSetStatus() {
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getBaseBundlePersistentResource(
-				Mockito.mock(JenkinsMaster.class), RandomTestUtil.randomLong());
+				_getJenkinsMaster(), RandomTestUtil.randomLong());
 
 		String why = RandomTestUtil.randomString();
 
@@ -92,8 +92,7 @@ public class BaseBundlePersistentResourceTest
 			new AtomicReference<>();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(
-				Mockito.mock(JenkinsMaster.class), 0);
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), 0);
 
 		Mockito.doAnswer(
 			invocation -> dataJSONObjectAtomicReference.get()
@@ -154,7 +153,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateCancelledQueueItem() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = RandomTestUtil.randomLong();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -216,31 +215,42 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateControllerHandover() {
+		String currentTopLevelBuildURL =
+			"https://" + RandomTestUtil.randomString() + "/job/" +
+				RandomTestUtil.randomString() + "/1/";
+
 		_testUpdateControllerHandover(
-			false, "", PersistentResource.Status.IN_QUEUE);
-		_testUpdateControllerHandover(
-			false, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), currentTopLevelBuildURL, false,
 			PersistentResource.Status.IN_PROGRESS);
 		_testUpdateControllerHandover(
-			true, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), currentTopLevelBuildURL, false,
+			PersistentResource.Status.NOT_STARTED);
+		_testUpdateControllerHandover(
+			RandomTestUtil.randomString(), currentTopLevelBuildURL, true,
+			PersistentResource.Status.IN_QUEUE);
+		_testUpdateControllerHandover(
+			currentTopLevelBuildURL, currentTopLevelBuildURL, false,
+			PersistentResource.Status.IN_QUEUE);
+		_testUpdateControllerHandover(
+			null, currentTopLevelBuildURL, false,
 			PersistentResource.Status.IN_QUEUE);
 	}
 
 	@Test
 	public void testUpdateFailedInvocation() {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
-
 		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(jenkinsMaster, 0);
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), 0);
 
-		_setUpInvocation(baseBundlePersistentResource, jenkinsMaster);
+		Mockito.doCallRealMethod(
+		).when(
+			baseBundlePersistentResource
+		).start();
 
 		ReflectionTestUtil.setFieldValue(
 			baseBundlePersistentResource, "_status",
 			PersistentResource.Status.NOT_STARTED);
 
 		AtomicInteger invocationCount = new AtomicInteger();
-		AtomicLong queueIdAtomicLong = new AtomicLong();
 
 		try (MockedStatic<JenkinsResultsParserUtil>
 				jenkinsResultsParserUtilMockedStatic =
@@ -250,7 +260,7 @@ public class BaseBundlePersistentResourceTest
 							invocation -> {
 								invocationCount.incrementAndGet();
 
-								return queueIdAtomicLong.get();
+								return 0L;
 							}))) {
 
 			_update(baseBundlePersistentResource, 5);
@@ -272,15 +282,31 @@ public class BaseBundlePersistentResourceTest
 			).print(
 				"No invocation attempts remaining"
 			);
+		}
+	}
 
-			baseBundlePersistentResource = _getBaseBundlePersistentResource(
-				jenkinsMaster, 0);
+	@Test
+	public void testUpdateFailedInvocationReset() {
+		BaseBundlePersistentResource baseBundlePersistentResource =
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), 0);
 
-			_setUpInvocation(baseBundlePersistentResource, jenkinsMaster);
+		Mockito.doCallRealMethod(
+		).when(
+			baseBundlePersistentResource
+		).start();
 
-			ReflectionTestUtil.setFieldValue(
-				baseBundlePersistentResource, "_status",
-				PersistentResource.Status.NOT_STARTED);
+		ReflectionTestUtil.setFieldValue(
+			baseBundlePersistentResource, "_status",
+			PersistentResource.Status.NOT_STARTED);
+
+		AtomicLong queueIdAtomicLong = new AtomicLong();
+
+		try (MockedStatic<JenkinsResultsParserUtil>
+				jenkinsResultsParserUtilMockedStatic =
+					_mockJenkinsResultsParserUtil(
+						Collections.singletonMap(
+							"invokeJenkinsBuild",
+							invocation -> queueIdAtomicLong.get()))) {
 
 			_update(baseBundlePersistentResource, 4);
 
@@ -317,24 +343,16 @@ public class BaseBundlePersistentResourceTest
 			_testUpdateFollowerControllerFinished(true, 0, status);
 			_testUpdateFollowerControllerFinished(true, 1, status);
 		}
+	}
 
-		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getFollowerBaseBundlePersistentResource(
-				_getDataJSONObject(0, PersistentResource.Status.IN_PROGRESS));
-
-		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
-				_mockJenkinsAPIUtil("")) {
-
-			baseBundlePersistentResource.update();
-		}
-
-		Assert.assertEquals(
-			PersistentResource.Status.IN_PROGRESS,
-			baseBundlePersistentResource.getStatus());
-
-		Mockito.verify(
-			baseBundlePersistentResource, Mockito.never()
-		).save();
+	@Test
+	public void testUpdateFollowerControllerRunning() {
+		_testUpdateFollowerControllerRunning(
+			PersistentResource.Status.IN_PROGRESS);
+		_testUpdateFollowerControllerRunning(
+			PersistentResource.Status.IN_QUEUE);
+		_testUpdateFollowerControllerRunning(
+			PersistentResource.Status.NOT_STARTED);
 	}
 
 	@Test
@@ -363,11 +381,19 @@ public class BaseBundlePersistentResourceTest
 				PersistentResource.Status.IN_PROGRESS,
 				baseBundlePersistentResource.getStatus());
 
-			_setArtifactsAvailable(true, baseBundlePersistentResource);
+			Mockito.doReturn(
+				true
+			).when(
+				baseBundlePersistentResource
+			).isArtifactsAvailable();
 
 			baseBundlePersistentResource.update();
 
-			_setArtifactsAvailable(false, baseBundlePersistentResource);
+			Mockito.doReturn(
+				false
+			).when(
+				baseBundlePersistentResource
+			).isArtifactsAvailable();
 
 			baseBundlePersistentResource.update();
 
@@ -381,26 +407,13 @@ public class BaseBundlePersistentResourceTest
 				baseBundlePersistentResource
 			).save();
 		}
+	}
 
-		baseBundlePersistentResource = _getFollowerBaseBundlePersistentResource(
-			_getDataJSONObject(2, PersistentResource.Status.SUCCESS));
-
-		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
-				_mockJenkinsAPIUtil("FAILURE")) {
-
-			_update(baseBundlePersistentResource, 2);
-		}
-
-		Assert.assertEquals(
-			PersistentResource.Status.FAILED,
-			baseBundlePersistentResource.getStatus());
-
-		Mockito.verify(
-			baseBundlePersistentResource, Mockito.never()
-		).save();
-
-		baseBundlePersistentResource = _getFollowerBaseBundlePersistentResource(
-			_getDataJSONObject(0, PersistentResource.Status.SUCCESS));
+	@Test
+	public void testUpdateFollowerMissingArtifactsControllerRunning() {
+		BaseBundlePersistentResource baseBundlePersistentResource =
+			_getFollowerBaseBundlePersistentResource(
+				_getDataJSONObject(0, PersistentResource.Status.SUCCESS));
 
 		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
 				_mockJenkinsAPIUtil("")) {
@@ -422,12 +435,37 @@ public class BaseBundlePersistentResourceTest
 	}
 
 	@Test
+	public void testUpdateFollowerMissingArtifactsFailed() {
+		BaseBundlePersistentResource baseBundlePersistentResource =
+			_getFollowerBaseBundlePersistentResource(
+				_getDataJSONObject(2, PersistentResource.Status.SUCCESS));
+
+		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
+				_mockJenkinsAPIUtil("FAILURE")) {
+
+			_update(baseBundlePersistentResource, 2);
+		}
+
+		Assert.assertEquals(
+			PersistentResource.Status.FAILED,
+			baseBundlePersistentResource.getStatus());
+
+		Mockito.verify(
+			baseBundlePersistentResource, Mockito.never()
+		).save();
+	}
+
+	@Test
 	public void testUpdateFollowerSuccess() {
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getFollowerBaseBundlePersistentResource(
 				_getDataJSONObject(0, PersistentResource.Status.SUCCESS));
 
-		_setArtifactsAvailable(true, baseBundlePersistentResource);
+		Mockito.doReturn(
+			true
+		).when(
+			baseBundlePersistentResource
+		).isArtifactsAvailable();
 
 		baseBundlePersistentResource.update();
 
@@ -446,10 +484,9 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateFoundBuild() {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
-
 		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(jenkinsMaster, _getQueueId());
+			_getBaseBundlePersistentResource(
+				_getJenkinsMaster(), _getQueueId());
 
 		String buildURL =
 			"https://" + RandomTestUtil.randomString() + "/job/" +
@@ -477,7 +514,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateInQueue() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = RandomTestUtil.randomLong();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -582,7 +619,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateLookupFailure() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = _getQueueId();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -660,23 +697,6 @@ public class BaseBundlePersistentResourceTest
 				Mockito.contains("(9 of 10)")
 			);
 
-			ioExceptionAtomicReference.set(null);
-
-			baseBundlePersistentResource.update();
-
-			ioExceptionAtomicReference.set(
-				new IOException(RandomTestUtil.randomString()));
-
-			_update(baseBundlePersistentResource, 9);
-
-			Assert.assertEquals(
-				PersistentResource.Status.IN_QUEUE,
-				baseBundlePersistentResource.getStatus());
-
-			Mockito.verify(
-				baseBundlePersistentResource, Mockito.never()
-			).save();
-
 			baseBundlePersistentResource.update();
 
 			Assert.assertEquals(
@@ -696,11 +716,58 @@ public class BaseBundlePersistentResourceTest
 	}
 
 	@Test
-	public void testUpdateMissingQueueItem() {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
-
+	public void testUpdateLookupFailureReset() throws Exception {
 		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(jenkinsMaster, -1);
+			_getBaseBundlePersistentResource(
+				_getJenkinsMaster(), _getQueueId());
+
+		AtomicReference<IOException> ioExceptionAtomicReference =
+			new AtomicReference<>();
+
+		try (MockedStatic<JenkinsResultsParserUtil>
+				jenkinsResultsParserUtilMockedStatic =
+					_mockJenkinsResultsParserUtil(
+						Collections.singletonMap(
+							"fetchBuildURL",
+							invocation -> {
+								IOException ioException =
+									ioExceptionAtomicReference.get();
+
+								if (ioException != null) {
+									throw ioException;
+								}
+
+								return null;
+							}))) {
+
+			ioExceptionAtomicReference.set(
+				new IOException(RandomTestUtil.randomString()));
+
+			_update(baseBundlePersistentResource, 9);
+
+			ioExceptionAtomicReference.set(null);
+
+			baseBundlePersistentResource.update();
+
+			ioExceptionAtomicReference.set(
+				new IOException(RandomTestUtil.randomString()));
+
+			_update(baseBundlePersistentResource, 9);
+
+			Assert.assertEquals(
+				PersistentResource.Status.IN_QUEUE,
+				baseBundlePersistentResource.getStatus());
+
+			Mockito.verify(
+				baseBundlePersistentResource, Mockito.never()
+			).save();
+		}
+	}
+
+	@Test
+	public void testUpdateMissingQueueItem() {
+		BaseBundlePersistentResource baseBundlePersistentResource =
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), -1);
 
 		baseBundlePersistentResource.update();
 
@@ -708,9 +775,7 @@ public class BaseBundlePersistentResourceTest
 			baseBundlePersistentResource, Mockito.never()
 		).start();
 
-		for (int i = 0; i < 4; i++) {
-			baseBundlePersistentResource.update();
-		}
+		_update(baseBundlePersistentResource, 4);
 
 		Mockito.verify(
 			baseBundlePersistentResource, Mockito.times(2)
@@ -741,7 +806,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateMissingQueueItemReset() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = _getQueueId();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -829,7 +894,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateStartedQueueItem() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = RandomTestUtil.randomLong();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -881,7 +946,7 @@ public class BaseBundlePersistentResourceTest
 	public void testUpdateTransientFailure() {
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getBaseBundlePersistentResource(
-				Mockito.mock(JenkinsMaster.class), _getQueueId());
+				_getJenkinsMaster(), _getQueueId());
 
 		ReflectionTestUtil.setFieldValue(
 			baseBundlePersistentResource, "_status",
@@ -914,7 +979,7 @@ public class BaseBundlePersistentResourceTest
 
 	@Test
 	public void testUpdateWaitingQueueItem() throws Exception {
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = _getQueueId();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
@@ -1041,6 +1106,12 @@ public class BaseBundlePersistentResourceTest
 			baseBundlePersistentResource
 		).update();
 
+		Mockito.doReturn(
+			Mockito.mock(BuildDatabase.class)
+		).when(
+			baseBundlePersistentResource
+		).getBuildDatabase();
+
 		String currentTopLevelBuildURL =
 			"https://" + RandomTestUtil.randomString() + "/job/" +
 				RandomTestUtil.randomString() + "/1/";
@@ -1056,6 +1127,12 @@ public class BaseBundlePersistentResourceTest
 		).when(
 			baseBundlePersistentResource
 		).getDataJSONObject();
+
+		Mockito.doReturn(
+			new Properties()
+		).when(
+			baseBundlePersistentResource
+		).getStartProperties();
 
 		ReflectionTestUtil.setFieldValue(
 			baseBundlePersistentResource, "_controllerBuildURL",
@@ -1091,8 +1168,7 @@ public class BaseBundlePersistentResourceTest
 		_getFollowerBaseBundlePersistentResource(JSONObject dataJSONObject) {
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(
-				Mockito.mock(JenkinsMaster.class), 0);
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), 0);
 
 		Mockito.doCallRealMethod(
 		).when(
@@ -1110,6 +1186,28 @@ public class BaseBundlePersistentResourceTest
 			dataJSONObject.getString("controller_build_url"));
 
 		return baseBundlePersistentResource;
+	}
+
+	private JenkinsMaster _getJenkinsMaster() {
+		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+
+		JenkinsCohort jenkinsCohort = Mockito.mock(JenkinsCohort.class);
+
+		Mockito.doReturn(
+			jenkinsMaster
+		).when(
+			jenkinsCohort
+		).getMostAvailableJenkinsMaster(
+			Mockito.any(), Mockito.anyInt(), Mockito.anyString()
+		);
+
+		Mockito.doReturn(
+			jenkinsCohort
+		).when(
+			jenkinsMaster
+		).getJenkinsCohort();
+
+		return jenkinsMaster;
 	}
 
 	private long _getQueueId() {
@@ -1155,65 +1253,17 @@ public class BaseBundlePersistentResourceTest
 			});
 	}
 
-	private void _setArtifactsAvailable(
-		boolean artifactsAvailable,
-		BaseBundlePersistentResource baseBundlePersistentResource) {
+	private void _testStart(
+		long expectedProducerQueueId, PersistentResource.Status expectedStatus,
+		Answer<Object> invokeJenkinsBuildAnswer) {
 
-		Mockito.doReturn(
-			artifactsAvailable
-		).when(
-			baseBundlePersistentResource
-		).isArtifactsAvailable();
-	}
-
-	private void _setUpInvocation(
-		BaseBundlePersistentResource baseBundlePersistentResource,
-		JenkinsMaster jenkinsMaster) {
-
-		JenkinsCohort jenkinsCohort = Mockito.mock(JenkinsCohort.class);
-
-		Mockito.doReturn(
-			jenkinsMaster
-		).when(
-			jenkinsCohort
-		).getMostAvailableJenkinsMaster(
-			Mockito.any(), Mockito.anyInt(), Mockito.anyString()
-		);
-
-		Mockito.doReturn(
-			jenkinsCohort
-		).when(
-			jenkinsMaster
-		).getJenkinsCohort();
+		BaseBundlePersistentResource baseBundlePersistentResource =
+			_getBaseBundlePersistentResource(_getJenkinsMaster(), 0);
 
 		Mockito.doCallRealMethod(
 		).when(
 			baseBundlePersistentResource
 		).start();
-
-		Mockito.doReturn(
-			Mockito.mock(BuildDatabase.class)
-		).when(
-			baseBundlePersistentResource
-		).getBuildDatabase();
-
-		Mockito.doReturn(
-			new Properties()
-		).when(
-			baseBundlePersistentResource
-		).getStartProperties();
-	}
-
-	private void _testStart(
-		long expectedProducerQueueId, PersistentResource.Status expectedStatus,
-		Answer<Object> invokeJenkinsBuildAnswer) {
-
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
-
-		BaseBundlePersistentResource baseBundlePersistentResource =
-			_getBaseBundlePersistentResource(jenkinsMaster, 0);
-
-		_setUpInvocation(baseBundlePersistentResource, jenkinsMaster);
 
 		try (MockedStatic<JenkinsResultsParserUtil>
 				jenkinsResultsParserUtilMockedStatic =
@@ -1244,27 +1294,33 @@ public class BaseBundlePersistentResourceTest
 	}
 
 	private void _testUpdateControllerHandover(
-		boolean expectedCancelled, String otherControllerBuildURL,
-		PersistentResource.Status status) {
+		String controllerBuildURL, String currentTopLevelBuildURL,
+		boolean expectedCancelled, PersistentResource.Status status) {
 
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 		long queueId = _getQueueId();
 
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getBaseBundlePersistentResource(jenkinsMaster, queueId);
 
-		String controllerBuildURL =
-			baseBundlePersistentResource.getControllerBuildURL();
+		Mockito.doReturn(
+			currentTopLevelBuildURL
+		).when(
+			baseBundlePersistentResource
+		).getCurrentTopLevelBuildURL();
 
 		Mockito.doReturn(
 			new JSONObject(
 			).put(
-				"controller_build_url", otherControllerBuildURL
+				"controller_build_url", controllerBuildURL
 			)
 		).when(
 			baseBundlePersistentResource
 		).getDataJSONObject();
 
+		ReflectionTestUtil.setFieldValue(
+			baseBundlePersistentResource, "_controllerBuildURL",
+			currentTopLevelBuildURL);
 		ReflectionTestUtil.setFieldValue(
 			baseBundlePersistentResource, "_status", status);
 
@@ -1284,28 +1340,52 @@ public class BaseBundlePersistentResourceTest
 				getVerificationMode(expectedCancelled));
 		}
 
-		if (otherControllerBuildURL.isEmpty()) {
-			Assert.assertEquals(
-				controllerBuildURL,
-				baseBundlePersistentResource.getControllerBuildURL());
+		String expectedControllerBuildURL = controllerBuildURL;
 
-			return;
+		if (JenkinsResultsParserUtil.isNullOrEmpty(controllerBuildURL)) {
+			expectedControllerBuildURL = currentTopLevelBuildURL;
 		}
 
 		Assert.assertEquals(
-			otherControllerBuildURL,
+			expectedControllerBuildURL,
 			baseBundlePersistentResource.getControllerBuildURL());
-
-		Assert.assertFalse(baseBundlePersistentResource.isController());
+		Assert.assertEquals(
+			expectedControllerBuildURL.equals(currentTopLevelBuildURL),
+			baseBundlePersistentResource.isController());
 	}
 
 	private void _testUpdateFollowerControllerFinished(
 		boolean expectedRedispatched, int redispatchAttempts,
 		PersistentResource.Status status) {
 
+		AtomicReference<JSONObject> savedDataJSONObjectAtomicReference =
+			new AtomicReference<>();
+
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getFollowerBaseBundlePersistentResource(
 				_getDataJSONObject(redispatchAttempts, status));
+
+		Mockito.doAnswer(
+			invocation -> {
+				JSONObject savedDataJSONObject = new JSONObject();
+
+				baseBundlePersistentResource.populateDataJSONObject(
+					savedDataJSONObject);
+
+				savedDataJSONObjectAtomicReference.set(savedDataJSONObject);
+
+				return null;
+			}
+		).when(
+			baseBundlePersistentResource
+		).save();
+
+		Mockito.doCallRealMethod(
+		).when(
+			baseBundlePersistentResource
+		).populateDataJSONObject(
+			Mockito.any()
+		);
 
 		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
 				_mockJenkinsAPIUtil("FAILURE");
@@ -1322,11 +1402,41 @@ public class BaseBundlePersistentResourceTest
 			getVerificationMode(expectedRedispatched)
 		).save();
 
-		if (!expectedRedispatched) {
+		if (expectedRedispatched) {
+			JSONObject savedDataJSONObject =
+				savedDataJSONObjectAtomicReference.get();
+
 			Assert.assertEquals(
-				PersistentResource.Status.FAILED,
-				baseBundlePersistentResource.getStatus());
+				redispatchAttempts + 1,
+				savedDataJSONObject.getInt("redispatch_attempts"));
+
+			return;
 		}
+
+		Assert.assertEquals(
+			PersistentResource.Status.FAILED,
+			baseBundlePersistentResource.getStatus());
+	}
+
+	private void _testUpdateFollowerControllerRunning(
+		PersistentResource.Status status) {
+
+		BaseBundlePersistentResource followerBaseBundlePersistentResource =
+			_getFollowerBaseBundlePersistentResource(
+				_getDataJSONObject(0, status));
+
+		try (MockedStatic<JenkinsAPIUtil> jenkinsAPIUtilMockedStatic =
+				_mockJenkinsAPIUtil("")) {
+
+			followerBaseBundlePersistentResource.update();
+		}
+
+		Assert.assertEquals(
+			status, followerBaseBundlePersistentResource.getStatus());
+
+		Mockito.verify(
+			followerBaseBundlePersistentResource, Mockito.never()
+		).save();
 	}
 
 	private void _testUpdateFollowerFailed(
@@ -1380,16 +1490,17 @@ public class BaseBundlePersistentResourceTest
 		BaseBundlePersistentResource baseBundlePersistentResource =
 			_getFollowerBaseBundlePersistentResource(dataJSONObject);
 
-		JenkinsMaster jenkinsMaster = Mockito.mock(JenkinsMaster.class);
-
-		_setUpInvocation(baseBundlePersistentResource, jenkinsMaster);
-
 		Mockito.doCallRealMethod(
 		).when(
 			baseBundlePersistentResource
 		).populateDataJSONObject(
 			Mockito.any()
 		);
+
+		Mockito.doCallRealMethod(
+		).when(
+			baseBundlePersistentResource
+		).start();
 
 		Mockito.doReturn(
 			dataJSONObject,
@@ -1408,6 +1519,8 @@ public class BaseBundlePersistentResourceTest
 			"github.webhook.base.invocation.url", "http://test-1.liferay.com");
 
 		JenkinsResultsParserUtil.setBuildProperties(buildProperties);
+
+		JenkinsMaster jenkinsMaster = _getJenkinsMaster();
 
 		JenkinsCohort jenkinsCohort = jenkinsMaster.getJenkinsCohort();
 

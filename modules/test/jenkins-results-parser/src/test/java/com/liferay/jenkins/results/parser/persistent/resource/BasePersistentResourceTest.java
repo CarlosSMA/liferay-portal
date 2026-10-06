@@ -217,18 +217,43 @@ public class BasePersistentResourceTest
 			writtenS3ObjectPaths);
 
 		Assert.assertTrue(basePersistentResource.isTouched());
+	}
 
-		basePersistentResource = _getBasePersistentResource(true);
+	@Test
+	public void testTouchBuildCachingDisabled() {
+		BasePersistentResource basePersistentResource =
+			_getBasePersistentResource(false);
 
-		artifactS3ObjectPaths = _getArtifactS3ObjectPaths(
+		_getArtifactS3ObjectPaths(basePersistentResource, 1);
+
+		try (MockedStatic<CloudBucketUtil> cloudBucketUtilMockedStatic =
+				_mockCloudBucketUtil(
+					Collections.emptySet(), Collections.emptySet(),
+					new ArrayList<>())) {
+
+			basePersistentResource.touch();
+
+			cloudBucketUtilMockedStatic.verifyNoInteractions();
+		}
+
+		Assert.assertTrue(basePersistentResource.isTouched());
+	}
+
+	@Test
+	public void testTouchFailure() {
+		BasePersistentResource basePersistentResource =
+			_getBasePersistentResource(true);
+
+		List<String> artifactS3ObjectPaths = _getArtifactS3ObjectPaths(
 			basePersistentResource, 1);
-		dataS3ObjectPath = _getDataS3ObjectPath(basePersistentResource);
+		String dataS3ObjectPath = _getDataS3ObjectPath(basePersistentResource);
 
-		availableS3ObjectPaths = new HashSet<>(artifactS3ObjectPaths);
+		Set<String> availableS3ObjectPaths = new HashSet<>(
+			artifactS3ObjectPaths);
 
 		availableS3ObjectPaths.add(dataS3ObjectPath);
 
-		writtenS3ObjectPaths.clear();
+		List<String> writtenS3ObjectPaths = new ArrayList<>();
 
 		try (MockedStatic<CloudBucketUtil> cloudBucketUtilMockedStatic =
 				_mockCloudBucketUtil(
@@ -252,26 +277,6 @@ public class BasePersistentResourceTest
 				dataS3ObjectPath, artifactS3ObjectPaths.get(0),
 				dataS3ObjectPath, artifactS3ObjectPaths.get(0)),
 			writtenS3ObjectPaths);
-	}
-
-	@Test
-	public void testTouchBuildCachingDisabled() {
-		BasePersistentResource basePersistentResource =
-			_getBasePersistentResource(false);
-
-		_getArtifactS3ObjectPaths(basePersistentResource, 1);
-
-		try (MockedStatic<CloudBucketUtil> cloudBucketUtilMockedStatic =
-				_mockCloudBucketUtil(
-					Collections.emptySet(), Collections.emptySet(),
-					new ArrayList<>())) {
-
-			basePersistentResource.touch();
-
-			cloudBucketUtilMockedStatic.verifyNoInteractions();
-		}
-
-		Assert.assertTrue(basePersistentResource.isTouched());
 	}
 
 	private List<String> _getArtifactS3ObjectPaths(
