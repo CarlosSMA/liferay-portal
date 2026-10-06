@@ -102,7 +102,7 @@ liferay:
     path: ""
     repoURL: ""
     targetRevision: ""
-	valuesPrefix: liferay-default.
+    valuesPrefix: liferay-default.
 networkPolicy:
     apiServerSources: []
 observability:
