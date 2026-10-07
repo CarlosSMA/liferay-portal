@@ -74,13 +74,13 @@ export default function useKeyboardNavigation(
 	);
 
 	const stepIndex = (delta: 1 | -1) =>
-		setActiveIndex((index) =>
-			delta === 1
-				? (index + 1) % navigableItems.length
-				: index <= 0
-					? navigableItems.length - 1
-					: index - 1
-		);
+		setActiveIndex((index) => {
+			if (delta === 1) {
+				return (index + 1) % navigableItems.length;
+			}
+
+			return index <= 0 ? navigableItems.length - 1 : index - 1;
+		});
 
 	const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (!navigableItems.length) {

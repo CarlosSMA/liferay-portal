@@ -280,9 +280,7 @@ export default function OmniSearch({resultsURL}: {resultsURL: string}) {
 													onClick={item.onClick}
 													onDelete={item.onDelete}
 													onDeleteKeyDown={
-														item.onDelete
-															? onDeleteKeyDown
-															: undefined
+														onDeleteKeyDown
 													}
 												/>
 											);
