@@ -121,12 +121,8 @@ export default function AddDataMasksModal({
 
 			<ClayModal.Body className="pt-0 px-0">
 				<div className="sticky-top">
-					<ClayManagementToolbar>
-						<ClayManagementToolbar.Search
-							onSubmit={(event) => event.preventDefault()}
-						>
-							<AutoSearch onSearch={onSearch} query={query} />
-						</ClayManagementToolbar.Search>
+					<ClayManagementToolbar role="none">
+						<AutoSearch onSearch={onSearch} query={query} />
 					</ClayManagementToolbar>
 
 					<SelectedItemsBar
