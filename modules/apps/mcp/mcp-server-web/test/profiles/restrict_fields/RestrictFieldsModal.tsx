@@ -54,6 +54,10 @@ function expand(name: string) {
 	return userEvent.click(screen.getByRole('button', {expanded: false, name}));
 }
 
+function row(name: string) {
+	return screen.getByRole('treeitem', {name});
+}
+
 function search(value: string) {
 	return userEvent.type(searchBox(), value);
 }
@@ -573,6 +577,40 @@ describe('RestrictFieldsModal', () => {
 		expect(checkbox('description')).toBeVisible();
 		expect(checkbox('modifiedBy')).toBeVisible();
 		expect(screen.queryByText('no-results-found')).toBeNull();
+	});
+
+	it('disables the expander of a match whose fields are all hidden', async () => {
+		fetch.mockResponseOnce(JSON.stringify(mockTool));
+
+		renderModal();
+
+		await findCheckbox('modifiedBy');
+
+		await search('userGroupBriefs');
+
+		expect(
+			screen.getByRole('button', {name: 'userGroupBriefs'})
+		).toBeDisabled();
+		expect(screen.getByRole('button', {name: 'modifiedBy'})).toBeEnabled();
+	});
+
+	it('ignores the right arrow on a match whose fields are all hidden', async () => {
+		fetch.mockResponseOnce(JSON.stringify(mockTool));
+
+		renderModal();
+
+		await findCheckbox('modifiedBy');
+
+		await search('userGroupBriefs');
+
+		row('userGroupBriefs').focus();
+
+		await userEvent.keyboard('{ArrowRight}');
+
+		expect(row('userGroupBriefs')).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 	});
 
 	it('announces the number of matches while fields are visible', async () => {

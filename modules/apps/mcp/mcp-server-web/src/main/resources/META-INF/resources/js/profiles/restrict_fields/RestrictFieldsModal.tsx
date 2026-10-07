@@ -155,6 +155,9 @@ export default function RestrictFieldsModal({
 	const getRowClassName = (item: FieldTreeItem) =>
 		isVisible(item) ? undefined : 'd-none';
 
+	const isExpandable = (item: FieldTreeItem) =>
+		!!item.children?.length && item.children.some(isVisible);
+
 	return (
 		<>
 			<ClayModal.Header
@@ -223,6 +226,18 @@ export default function RestrictFieldsModal({
 											>
 												<TreeView.ItemStack
 													expandOnClick={false}
+													expanderDisabled={
+														!isExpandable(item)
+													}
+													onKeyDown={(event) => {
+														if (
+															event.key ===
+																'ArrowRight' &&
+															!isExpandable(item)
+														) {
+															event.preventDefault();
+														}
+													}}
 												>
 													<ClayCheckbox checked />
 
