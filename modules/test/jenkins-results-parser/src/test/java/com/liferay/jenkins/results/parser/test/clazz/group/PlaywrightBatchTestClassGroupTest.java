@@ -76,12 +76,11 @@ public class PlaywrightBatchTestClassGroupTest
 	@Test
 	public void testParsePlaywrightJSONObjectsDescribeBlocks() {
 		String projectName = RandomTestUtil.randomString();
+		File rootDir = new File(RandomTestUtil.randomString());
 		String specFilePath = RandomTestUtil.randomString();
 		String specTitle = RandomTestUtil.randomString();
 		String suiteTitle1 = RandomTestUtil.randomString();
 		String suiteTitle2 = RandomTestUtil.randomString();
-
-		File rootDir = new File(RandomTestUtil.randomString());
 
 		Map<String, Map<File, TestClass>> testClassesMaps =
 			_parsePlaywrightJSONObjects(
@@ -167,11 +166,10 @@ public class PlaywrightBatchTestClassGroupTest
 	public void testParsePlaywrightJSONObjectsSharedSpec() {
 		String projectName1 = RandomTestUtil.randomString();
 		String projectName2 = RandomTestUtil.randomString();
+		File rootDir = new File(RandomTestUtil.randomString());
 		String specFilePath = RandomTestUtil.randomString();
 		String specTitle1 = RandomTestUtil.randomString();
 		String specTitle2 = RandomTestUtil.randomString();
-
-		File rootDir = new File(RandomTestUtil.randomString());
 
 		Map<String, Map<File, TestClass>> testClassesMaps =
 			_parsePlaywrightJSONObjects(
