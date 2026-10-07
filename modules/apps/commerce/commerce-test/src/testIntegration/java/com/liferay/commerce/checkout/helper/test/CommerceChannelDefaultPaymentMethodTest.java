@@ -317,31 +317,28 @@ public class CommerceChannelDefaultPaymentMethodTest {
 			role.getRoleId(),
 			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS);
 
-		try {
-			User user = UserTestUtil.addUser(_group.getGroupId());
+		User user = UserTestUtil.addUser(_group.getGroupId());
 
-			_userGroupRoleLocalService.addUserGroupRole(
-				user.getUserId(), _accountEntry.getAccountEntryGroupId(),
-				role.getRoleId());
+		_userGroupRoleLocalService.addUserGroupRole(
+			user.getUserId(), _accountEntry.getAccountEntryGroupId(),
+			role.getRoleId());
 
-			PermissionThreadLocal.setPermissionChecker(
-				PermissionCheckerFactoryUtil.create(user));
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
 
-			boolean activePaymentMethodCommerceCheckoutStep =
-				_isActivePaymentMethodCommerceCheckoutStep();
+		boolean activePaymentMethodCommerceCheckoutStep =
+			_isActivePaymentMethodCommerceCheckoutStep();
 
-			Assert.assertEquals(
-				"money-order", _commerceOrder.getCommercePaymentMethodKey());
-			Assert.assertFalse(activePaymentMethodCommerceCheckoutStep);
-		}
-		finally {
-			_resourcePermissionLocalService.addResourcePermission(
-				_group.getCompanyId(), CommerceOrderConstants.RESOURCE_NAME,
-				ResourceConstants.SCOPE_GROUP_TEMPLATE,
-				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
-				role.getRoleId(),
-				CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS);
-		}
+		Assert.assertEquals(
+			"money-order", _commerceOrder.getCommercePaymentMethodKey());
+		Assert.assertFalse(activePaymentMethodCommerceCheckoutStep);
+
+		_resourcePermissionLocalService.addResourcePermission(
+			_group.getCompanyId(), CommerceOrderConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_GROUP_TEMPLATE,
+			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
+			role.getRoleId(),
+			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS);
 
 		Assert.assertTrue(_isActivePaymentMethodCommerceCheckoutStep());
 	}
