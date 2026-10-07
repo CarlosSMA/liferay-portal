@@ -207,6 +207,18 @@ describe('MapBase', () => {
 		});
 	});
 
+	describe('dispose()', () => {
+		it('calls destructor()', () => {
+			const destructor = jest.spyOn(mapImpl, 'destructor');
+
+			mapImpl._geoJSONLayer = {dispose: jest.fn()};
+
+			mapImpl.dispose();
+
+			expect(destructor).toHaveBeenCalledTimes(1);
+		});
+	});
+
 	describe('getNativeMap()', () => {
 		it('returns the _map property', () => {
 			mapImpl._map = {name: 'map'};
