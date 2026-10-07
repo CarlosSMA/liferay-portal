@@ -52,10 +52,10 @@ public abstract class BaseObjectEntryBatchEnginePortletDataHandlerTestCase
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		Scope scope = getScope();
-
 		List<ObjectDefinitionSetting> objectDefinitionSettings =
 			Collections.emptyList();
+
+		Scope scope = getScope();
 
 		if (scope == Scope.DEPOT) {
 			objectDefinitionSettings = Collections.singletonList(
