@@ -863,19 +863,20 @@ public class SharingEntryLocalServiceImpl
 
 		if (sharedEntryActions.isEmpty()) {
 			throw new SharingEntryActionIdsException(
-				"Shared entry actions is empty");
+				"Shared entry action IDs is empty");
 		}
 
 		for (SharingEntryAction curSharingEntryAction : sharedEntryActions) {
 			if (curSharingEntryAction == null) {
 				throw new SharingEntryActionIdsException(
-					"Shared entry actions contains a null value");
+					"Shared entry action IDs contains a null value");
 			}
 		}
 
 		if (!sharedEntryActions.contains(SharingEntryAction.VIEW)) {
 			throw new SharingEntryActionIdsException(
-				"Shared entry actions must contain VIEW shared entry action");
+				"Shared entry action IDs must contain VIEW shared entry " +
+					"action ID");
 		}
 	}
 
