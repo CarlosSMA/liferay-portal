@@ -545,8 +545,8 @@ public class ObjectFieldInfoFieldConverter {
 				listTypeEntryKey);
 		}
 
-		ListTypeEntry listTypeEntry = null;
 		Map<Long, ListTypeEntry> listTypeEntries = new HashMap<>();
+		ListTypeEntry listTypeEntry = null;
 
 		for (ListTypeEntry curListTypeEntry :
 				_listTypeEntryLocalService.getListTypeEntries(

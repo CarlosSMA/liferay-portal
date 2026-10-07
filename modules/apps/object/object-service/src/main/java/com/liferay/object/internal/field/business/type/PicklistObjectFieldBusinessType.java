@@ -360,8 +360,8 @@ public class PicklistObjectFieldBusinessType
 			listEntryKey = listEntry.getKey();
 		}
 
-		ListTypeEntry listTypeEntry = null;
 		Map<Long, ListTypeEntry> listTypeEntriesMap = new HashMap<>();
+		ListTypeEntry listTypeEntry = null;
 
 		for (ListTypeEntry curListTypeEntry :
 				_listTypeEntryLocalService.getListTypeEntries(

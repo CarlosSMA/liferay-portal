@@ -116,11 +116,11 @@ public abstract class BaseTasksSectionDisplayContext
 					return jsonArray;
 				}
 
+				Map<Long, ListTypeEntry> listTypeEntriesMap = new HashMap<>();
+
 				List<ListTypeEntry> listTypeEntries =
 					listTypeEntryLocalService.getListTypeEntries(
 						objectField.getListTypeDefinitionId());
-
-				Map<Long, ListTypeEntry> listTypeEntriesMap = new HashMap<>();
 
 				for (ListTypeEntry listTypeEntry : listTypeEntries) {
 					listTypeEntriesMap.put(

@@ -33,14 +33,14 @@ public class StateSelectorUtil {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
+		Map<Long, ListTypeEntry> listTypeEntriesMap = new HashMap<>();
+
 		ObjectField objectField = ObjectFieldLocalServiceUtil.fetchObjectField(
 			objectEntry.getObjectDefinitionId(), "state");
 
 		List<ListTypeEntry> listTypeEntries =
 			ListTypeEntryLocalServiceUtil.getListTypeEntries(
 				objectField.getListTypeDefinitionId());
-
-		Map<Long, ListTypeEntry> listTypeEntriesMap = new HashMap<>();
 
 		for (ListTypeEntry listTypeEntry : listTypeEntries) {
 			listTypeEntriesMap.put(
