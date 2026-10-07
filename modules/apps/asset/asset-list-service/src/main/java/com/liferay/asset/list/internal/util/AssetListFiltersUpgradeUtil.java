@@ -88,8 +88,9 @@ public class AssetListFiltersUpgradeUtil {
 				));
 		}
 
-		String filtersJSON = unicodeProperties.getProperty("filters");
 		JSONArray filtersJSONArray = JSONFactoryUtil.createJSONArray();
+
+		String filtersJSON = unicodeProperties.getProperty("filters");
 
 		if (Validator.isNotNull(filtersJSON)) {
 			try {
