@@ -217,11 +217,9 @@ describe('RestrictFieldsModal', () => {
 
 		renderModal();
 
-		expect(await screen.findByText('no-fields-were-found')).toHaveAttribute(
-			'role',
-			'status'
-		);
+		expect(await screen.findByText('no-fields-were-found')).toBeVisible();
 		expect(screen.getByRole('button', {name: 'save'})).toBeDisabled();
+		expect(screen.queryByText('nothing-selected')).toBeNull();
 	});
 
 	it('closes with an error toast when the tool cannot be loaded', async () => {

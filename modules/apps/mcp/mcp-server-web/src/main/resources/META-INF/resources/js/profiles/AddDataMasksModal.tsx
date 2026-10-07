@@ -120,16 +120,18 @@ export default function AddDataMasksModal({
 			</ClayModal.Header>
 
 			<ClayModal.Body className="pt-0 px-0">
-				<div className="sticky-top">
-					<ClayManagementToolbar role="none">
-						<AutoSearch onSearch={onSearch} query={query} />
-					</ClayManagementToolbar>
+				{!!tree.length && (
+					<div className="sticky-top">
+						<ClayManagementToolbar role="none">
+							<AutoSearch onSearch={onSearch} query={query} />
+						</ClayManagementToolbar>
 
-					<SelectedItemsBar
-						count={selectedExternalReferenceCodes.length}
-						onDeselectAll={() => setSelectedKeys(new Set())}
-					/>
-				</div>
+						<SelectedItemsBar
+							count={selectedExternalReferenceCodes.length}
+							onDeselectAll={() => setSelectedKeys(new Set())}
+						/>
+					</div>
+				)}
 
 				<div className="px-4 py-2">
 					{items.length ? (
@@ -182,7 +184,7 @@ export default function AddDataMasksModal({
 						</TreeView>
 					) : (
 						<div className="align-items-center d-flex justify-content-center py-4">
-							<p className="text-secondary" role="status">
+							<p className="text-secondary">
 								{Liferay.Language.get(
 									'no-data-masks-were-found'
 								)}

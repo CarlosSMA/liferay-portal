@@ -128,12 +128,14 @@ export default function RestrictFieldsModal({
 					<ClayLoadingIndicator />
 				) : (
 					<>
-						<div className="sticky-top">
-							<SelectedItemsBar
-								count={selectedKeys.size}
-								onDeselectAll={deselectAll}
-							/>
-						</div>
+						{!!items.length && (
+							<div className="sticky-top">
+								<SelectedItemsBar
+									count={selectedKeys.size}
+									onDeselectAll={deselectAll}
+								/>
+							</div>
+						)}
 
 						<div className="px-4 py-2" ref={treeRef}>
 							{items.length ? (
@@ -175,7 +177,7 @@ export default function RestrictFieldsModal({
 								</TreeView>
 							) : (
 								<div className="align-items-center d-flex justify-content-center py-4">
-									<p className="text-secondary" role="status">
+									<p className="text-secondary">
 										{Liferay.Language.get(
 											'no-fields-were-found'
 										)}
