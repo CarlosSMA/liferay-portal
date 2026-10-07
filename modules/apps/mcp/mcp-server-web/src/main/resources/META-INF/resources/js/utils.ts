@@ -100,28 +100,22 @@ export function buildToolWaves<T extends {toolName: string}>(
 export function filterDataMaskTree(
 	tree: DataMaskTreeItem[],
 	query: string
-): {expandedKeys: string[]; items: DataMaskTreeItem[]} {
-	if (!query) {
+): TreeFilter {
+	const loweredQuery = query.trim().toLowerCase();
+
+	if (!loweredQuery) {
 		return {
-			expandedKeys: tree.map((group) => group.id),
-			items: tree,
+			expandedKeys: new Set(tree.map((group) => group.id)),
+			matchCount: 0,
+			visibleKeys: new Set<string>(),
 		};
 	}
 
-	const loweredQuery = query.toLowerCase();
-
-	const items = tree.flatMap((group) => {
-		const children = (group.children ?? []).filter((child) =>
-			child.name.toLowerCase().includes(loweredQuery)
-		);
-
-		return children.length ? [{...group, children}] : [];
-	});
-
-	return {
-		expandedKeys: items.map((group) => group.id),
-		items,
-	};
+	return filterTree(
+		tree,
+		(item) =>
+			!item.children && item.name.toLowerCase().includes(loweredQuery)
+	);
 }
 
 export function filterTree<T extends TreeItem<T>>(
