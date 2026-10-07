@@ -432,11 +432,11 @@ public class ObjectFieldInfoFieldConverter {
 	}
 
 	private long _getMaximumFileSize(ObjectField objectField) {
-		String maximumFileSizeValue = ObjectFieldSettingUtil.getValue(
-			ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE, objectField);
-
 		long maximumFileSizeForGuestUsers =
 			_objectConfiguration.maximumFileSizeForGuestUsers();
+
+		String maximumFileSizeValue = ObjectFieldSettingUtil.getValue(
+			ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE, objectField);
 
 		if (maximumFileSizeValue == null) {
 			return maximumFileSizeForGuestUsers;
