@@ -45,8 +45,8 @@ public class AuditPseudonymLocalServiceTest {
 
 	@Test
 	public void testAddAuditPseudonym() throws Exception {
-		_testAddAuditPseudonym(StringPool.BLANK);
 		_testAddAuditPseudonym("INSTANCE");
+		_testAddAuditPseudonym(StringPool.BLANK);
 		_testAddAuditPseudonym(null);
 
 		String contextName = RandomTestUtil.randomString();
