@@ -1,6 +1,6 @@
 # Service Registration
 
-Catches registration defects that compile clean and surface only on a deployed portal. Add a scan here only when a wrong registration is provable from the tree alone, with no build and no false positives to dismiss.
+Catches registration defects that compile cleanly and surface only on a deployed portal. Add a scan here only when a wrong registration is provable from the tree alone, with no build and no false positives to dismiss.
 
 ## Match
 

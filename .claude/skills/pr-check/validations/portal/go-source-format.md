@@ -10,7 +10,7 @@ Formats hand written Go under `cloud/operator` with `gofmt` and the conventions 
 
 `cloud/operator/resources` is the Go module root — the directory that holds `go.mod`.
 
-Skip a changed file carrying the `// Code generated ... DO NOT EDIT.` marker, which the Match cannot filter on, since the next `go generate` overwrites it. Invoke the `format-source` skill scoped to the remaining changed Go files. It runs `gofmt` and applies `.claude/rules/go-style.md`. After it finishes, confirm the module is clean under `gofmt`:
+Skip a changed file carrying the `// Code generated ... DO NOT EDIT.` marker, since the next `go generate` overwrites it. The `## Match` cannot filter on that marker. Invoke the `format-source` skill scoped to the remaining changed Go files. It runs `gofmt` and applies `.claude/rules/go-style.md`. After it finishes, confirm the module is clean under `gofmt`:
 
 ```bash
 (cd "${REPO_ROOT}/cloud/operator/resources" && gofmt -l .)

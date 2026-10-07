@@ -8,7 +8,7 @@ Rebuilds every theme when a shared stylesheet changes, since a change to `clay-c
 
 ## Command
 
-A shared CSS change fans out to every theme. Select each module under `modules/apps` whose `package.json` declares a `liferayTheme` block, and take its Gradle project path. Scan `modules/apps` rather than `modules/apps/frontend-theme`, or the commerce themes are missed, which take the same `styled` parent and are affected by the same change:
+A shared CSS change fans out to every theme. Select each module under `modules/apps` whose `package.json` declares a `liferayTheme` block, and take its Gradle project path. Scan `modules/apps` rather than `modules/apps/frontend-theme`, or the scan misses the commerce themes, which take the same `styled` parent and are affected by the same change:
 
 ```bash
 (cd "${REPO_ROOT}" && command grep --files-with-matches --include='package.json' --recursive '"liferayTheme"' modules/apps) \

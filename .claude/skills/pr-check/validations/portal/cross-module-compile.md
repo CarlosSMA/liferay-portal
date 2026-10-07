@@ -1,6 +1,6 @@
 # Cross-Module Compile
 
-Compiles the consumers of a changed API that no other validation compiles. The first kind is a module carrying `.lfrbuild-portal-deprecated`, which the default profile leaves out. The second is the `testIntegration` source of a `-test` module the branch did not change. Both depend on the kernel as a binary rather than through `project(...)`, so they are found by searching for the changed type.
+Compiles the two kinds of consumer of a changed API that no other validation compiles. The first is a module carrying `.lfrbuild-portal-deprecated`, which the default profile leaves out. The second is the `testIntegration` source of a `-test` module the branch did not change. Both depend on the kernel as a binary rather than through `project(...)`, so they are found by searching for the changed type.
 
 ## Match
 

@@ -49,7 +49,7 @@ printf '%s' "${FINDINGS}"
 
 **Judge this from `${FINDINGS}` and never from the exit status**, which carries no verdict in either direction. The loop's status is whatever its last iteration happened to leave behind, so it reports on the diff's last Java file rather than on the diff. A clean branch ends on a `command grep` that matched nothing and exits 1. A branch that adds transaction usage in an early file and ends on a clean one also exits 1. `continue` returns 0, so a diff whose last Java file is generated exits 0 whatever preceded it. Both statuses occur on both verdicts.
 
-Run the loop from `${REPO_ROOT}`. The changed paths are relative to the repository root, so from anywhere below it every file test fails and the check passes having scanned nothing.
+Run the loop from `${REPO_ROOT}`. The changed paths are relative to the repository root, so from any directory below it, every file test fails and the check passes without scanning anything.
 
 Use `while read` rather than a `for` over an unquoted substitution, so a path holding whitespace stays one file rather than splitting into several.
 

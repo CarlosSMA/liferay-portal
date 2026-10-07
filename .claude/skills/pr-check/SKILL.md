@@ -79,11 +79,11 @@ Run only the validations in the scopes the settings enable, and skip every valid
 
 Each validation in the branch and portal scopes fires on the changed paths, relative to the repository root, that match the regex under its `## Match`. ` &! ` splits a regex into an include side and an exclude side, and a path has to match the first and not the second.
 
-The script [select_paths.sh](select_paths.sh) beside this document applies the routing and the regex. Given the merge base, a validation file, and for a workspace validation the workspace directory name, it prints the paths the validation selects, relative to the workspace for a workspace validation, and exits 1 when it selects none.
+The script [select_paths.sh](select_paths.sh) beside this document applies the routing and the regex. Given the merge base, a validation file, and, for a workspace validation, the workspace directory name, it prints the paths that the validation selects and exits 1 when it selects none. It prints a workspace validation's paths relative to the workspace.
 
 ### Module
 
-The script [find_modules.sh](find_modules.sh) beside this document takes paths relative to the repository root, from any directory inside it, finds the module of every path, and writes one line for it, `<module> <path>`, such as `modules/apps/blogs/blogs-api modules/apps/blogs/blogs-api/src/main/java/Foo.java`. A **Command** that works on modules pipes its paths through it.
+The script [find_modules.sh](find_modules.sh) beside this document reads paths relative to the repository root on standard input and runs from any directory inside it. For each path, it finds the module and writes one line, `<module> <path>`, such as `modules/apps/blogs/blogs-api modules/apps/blogs/blogs-api/src/main/java/Foo.java`. A **Command** that works on modules pipes its paths through it.
 
 - **Module** is the outermost directory above the path that the path's build root builds as a project. In a workspace, that is a directory holding `bnd.bnd` or `client-extension.yaml`, the rule the workspace Gradle plugin uses. The plugin also builds themes, wars, and JavaScript portlets, which no validation selects yet. Everywhere else, it is a directory holding `bnd.bnd`, `build.xml`, `gulpfile.js`, or `src/main/resources/application.properties`, not counting `modules` itself, the rule the Gradle settings plugin uses. It is `-` when there is none. A module under `modules` also has a Gradle project path, the directory without `modules/` and with `:` for `/`, such as `apps:blogs:blogs-api`.
 
@@ -187,7 +187,15 @@ An autocommit can change the diff, so recompute the ledger after a validation wh
 
 Tell Integration Test Compile and Per-Module Compile whether Full Portal Build is in the run, since each narrows its work when it is.
 
-Give the subagent everything the validations use and none of them define. That is `${REPO_ROOT}`, `${BASE_BRANCH}`, `${SOURCE_SHA}`, `${BUILD_ROOT}` for a workspace validation, `${MERGE_BASE}`, and for a branch or portal validation `${SKILL_DIR}` as the absolute path of the directory holding this document and `${VALIDATION_FILE}` as the absolute path of its validation file, the ticket their **Autocommit** sections write into a commit title as `<TICKET>`, and the result its own verdict implies for committing, since the rule above lives here and the subagent never reads this document:
+Give the subagent everything that the validations use but none of them defines:
+
+- `${REPO_ROOT}`, `${BASE_BRANCH}`, `${SOURCE_SHA}`, and `${MERGE_BASE}`.
+- `${BUILD_ROOT}` for a workspace validation.
+- `${SKILL_DIR}` and `${VALIDATION_FILE}` for a branch or portal validation, as the absolute paths of the directory holding this document and of its validation file.
+- The ticket that its **Autocommit** section writes into a commit title as `<TICKET>`.
+- The result that its own verdict implies for committing, since the rule above lives here and the subagent never reads this document.
+
+Resolve `${REPO_ROOT}` with:
 
 ```bash
 REPO_ROOT=$(git rev-parse --show-toplevel)

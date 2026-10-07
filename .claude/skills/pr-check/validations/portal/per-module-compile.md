@@ -19,7 +19,7 @@ bash "${SKILL_DIR}/select_paths.sh" "${MERGE_BASE}" "${VALIDATION_FILE}" \
 	| sed "s#^modules/##; s#/#:#g"
 ```
 
-Drop a module the branch deleted, which `find_modules.sh` still names through the merge base but which has nothing left to deploy, and report its paths as paths that sit in no module, below. A module was deleted when `git cat-file -e "HEAD:<module directory>"` fails. When the runner says Full Portal Build is in the run, drop each module carrying `.lfrbuild-portal` as well, since `ant all` already deploys it.
+Drop a module the branch deleted, which `find_modules.sh` still names through the merge base but which has nothing left to deploy, and report its paths below as paths that sit in no module. A module was deleted when `git cat-file -e "HEAD:<module directory>"` fails. When the runner says Full Portal Build is in the run, drop each module carrying `.lfrbuild-portal` as well, since `ant all` already deploys it.
 
 Exclude modules whose **only** Java change is under `src/testIntegration`. Integration Test Compile already runs `compileTestIntegrationJava` for those, and `-test` modules do not deploy a runtime bundle — `gradlew :path:deploy` would be redundant. A diff that touches `src/testIntegration` *and* anything else in the same module still puts the module in the deploy set.
 
@@ -104,7 +104,7 @@ A changed path that sits in no module, other than the shared tooling above, has 
 bash "${SKILL_DIR}/select_paths.sh" "${MERGE_BASE}" "${VALIDATION_FILE}" | bash "${SKILL_DIR}/find_modules.sh" "${MERGE_BASE}" | command grep '^- ' | cut -d " " -f2-
 ```
 
-Report **NOT VERIFIED** naming every such path, and also when that tooling expanded to no module. When a changed path does sit inside a module and the set is still empty, the derivation is broken, so report that as a FAIL. PASS when every module in the deploy set reports `BUILD SUCCESSFUL`.
+Report **NOT VERIFIED** naming every such path, and also when that tooling expanded to no module. When a changed path does sit inside a module and the set is still empty, the derivation is broken, so report that as a FAIL. The validation passes when every module in the deploy set reports `BUILD SUCCESSFUL`.
 
 ## Checklist
 

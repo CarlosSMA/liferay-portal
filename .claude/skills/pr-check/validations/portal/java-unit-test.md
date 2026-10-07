@@ -32,7 +32,7 @@ Install the portal snapshot before running any module test, since the module com
 (cd "${REPO_ROOT}" && ant compile install-portal-snapshots)
 ```
 
-For OSGi modules — run only the specific test class, batching counterparts within the same module. Take the Gradle project path of each changed module:
+For OSGi modules, run only the specific test class, batching counterparts within the same module. Take the Gradle project path of each changed module:
 
 ```bash
 bash "${SKILL_DIR}/select_paths.sh" "${MERGE_BASE}" "${VALIDATION_FILE}" \

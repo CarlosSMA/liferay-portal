@@ -8,13 +8,13 @@ When a change touches a `## Match` section, the routing, the list in `SKILL.md`,
 
 ## Scripts
 
-When a change touches `select_paths.sh`, `select_validations.sh`, or `find_modules.sh`, test it locally in a throwaway git repository, with commit signing turned off, that plants the marker files each case needs, and compare every printed line with the line you expect. Neither script carries committed test cases.
+When a change touches `select_paths.sh`, `select_validations.sh`, or `find_modules.sh`, test it locally in a throwaway Git repository, with commit signing turned off, that plants the marker files each case needs, and compare every printed line with the line you expect. None of the scripts carries committed test cases.
 
-For `find_modules.sh`, cover a path under `src/main`, `src/test`, `src/testIntegration`, and `src/jmh`, a `.groovy` resource, a path with a space, a nested module, which resolves to the outermost, a module deleted on the branch, which resolves through the merge base, `modules/.releng`, `modules/test/playwright`, which is no module, Poshi and `portal-web/test`, a file at the repository root, and in a workspace a client extension, a module, and a theme, which is no module there.
+For `find_modules.sh`, cover a path under `src/main`, `src/test`, `src/testIntegration`, and `src/jmh`; a `.groovy` resource; a path with a space; a nested module, which resolves to the outermost; a module deleted on the branch, which resolves through the merge base; `modules/.releng`; `modules/test/playwright`, which is no module; Poshi and `portal-web/test`; a file at the repository root; and, in a workspace, a client extension, a module, and a theme, which is no module there.
 
-For `select_paths.sh`, cover a branch, a portal, and a workspace validation, a Match with an ` &! ` exclude side, a portal validation that must not see workspace paths, the regenerated and owned paths of a workspace other than `liferay-sample-workspace`, and the three errors, a file with no `## Match`, an unknown folder, and a workspace validation without a workspace name.
+For `select_paths.sh`, cover a branch, a portal, and a workspace validation; a `## Match` with an ` &! ` exclude side; a portal validation that must not see workspace paths; the regenerated and owned paths of a workspace other than `liferay-sample-workspace`; and the three errors: a file with no `## Match`, an unknown folder, and a workspace validation without a workspace name.
 
-Break each rule in a copy of the script and confirm a case fails, so that a case that can never fail does not read as coverage.
+Break each rule in a copy of the script and confirm that a case fails, so that a case that can never fail does not read as coverage.
 
 ## Commands
 

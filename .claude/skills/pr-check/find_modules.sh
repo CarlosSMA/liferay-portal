@@ -9,7 +9,7 @@ function main {
 	do
 		local marker_files="bnd.bnd build.xml gulpfile.js src/main/resources/application.properties"
 
-		if echo "${path}" | grep --extended-regexp --quiet '^workspaces/[^/]+-workspace/'
+		if echo "${path}" | grep --extended-regexp "^workspaces/[^/]+-workspace/" > /dev/null
 		then
 			marker_files="bnd.bnd client-extension.yaml"
 		fi
@@ -19,8 +19,8 @@ function main {
 
 		dir=$(dirname "${path}")
 
-		while [ "${dir}" != . ] &&
-			  [ "${dir}" != / ]
+		while [[ ${dir} != . ]] &&
+		      [[ ${dir} != / ]]
 		do
 			if _has_marker_file "${dir}" "${marker_files}" "${1}"
 			then
@@ -35,7 +35,7 @@ function main {
 }
 
 function _has_marker_file {
-	if [ "${1}" == modules ]
+	if [[ ${1} == modules ]]
 	then
 		return 1
 	fi
@@ -44,13 +44,13 @@ function _has_marker_file {
 
 	for marker_file in ${2}
 	do
-		if [ -e "${1}/${marker_file}" ]
+		if [[ -e ${1}/${marker_file} ]]
 		then
 			return 0
 		fi
 	done
 
-	if [ -d "${1}" ]
+	if [[ -d ${1} ]]
 	then
 		return 1
 	fi

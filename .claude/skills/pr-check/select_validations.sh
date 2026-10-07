@@ -38,7 +38,7 @@ function _print_estimate {
 
 	paths=$(bash "$(dirname "${0}")/select_paths.sh" "${1}" "${2}" "${3}")
 
-	if [ -n "${paths}" ]
+	if [[ ! -z ${paths} ]]
 	then
 		echo "== ${2} ${3} ($(echo "${paths}" | wc -l | tr -d " ") paths)"
 

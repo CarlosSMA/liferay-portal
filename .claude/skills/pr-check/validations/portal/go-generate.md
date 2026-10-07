@@ -1,6 +1,6 @@
 # Go Generate
 
-Runs `go generate` and fails when that changes the committed CRD, which means it has drifted from the API types that produce it. Drift has three sources. A type or a `+kubebuilder:` marker changed without a regeneration, a `go.mod` bump changed the controller-gen version stamped into the CRD, or the source formatter release `go_build.sh` uses disagrees with the one the repository resolves, as in commit `f3d6fcaa`.
+Runs `go generate` and fails when that changes the committed CRD, which means it has drifted from the API types that produce it. Drift has three sources: a type or a `+kubebuilder:` marker changed without a regeneration, a `go.mod` bump changed the controller-gen version stamped into the CRD, or the source formatter release `go_build.sh` uses disagrees with the one the repository resolves, as in commit `f3d6fcaa`.
 
 ## Match
 
