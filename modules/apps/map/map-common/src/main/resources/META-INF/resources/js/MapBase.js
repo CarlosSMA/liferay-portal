@@ -220,6 +220,17 @@ class MapBase extends EventEmitter {
 	}
 
 	/**
+	 * Runs destructor() on dispose(), which Liferay.destroyComponent and other
+	 * callers use to tear down the map.
+	 * @review
+	 */
+	disposeInternal() {
+		this.destructor();
+
+		super.disposeInternal();
+	}
+
+	/**
 	 * @protected
 	 * @review
 	 *
