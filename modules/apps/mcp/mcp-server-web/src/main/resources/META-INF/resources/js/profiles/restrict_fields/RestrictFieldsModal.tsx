@@ -50,6 +50,7 @@ export default function RestrictFieldsModal({
 	const [selectedKeys, setSelectedKeys] = useState<Set<React.Key>>(new Set());
 	const [treeVersion, setTreeVersion] = useState(0);
 
+	const expandedKeysBeforeFilterRef = useRef<Set<React.Key> | null>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const treeRef = useRef<HTMLDivElement>(null);
 
@@ -111,6 +112,18 @@ export default function RestrictFieldsModal({
 
 	const onSearch = (value: string) => {
 		setQuery(value);
+
+		if (!value.trim()) {
+			setExpandedKeys(
+				expandedKeysBeforeFilterRef.current ?? expandedKeys
+			);
+
+			expandedKeysBeforeFilterRef.current = null;
+
+			return;
+		}
+
+		expandedKeysBeforeFilterRef.current ??= expandedKeys;
 
 		setExpandedKeys(filterFieldTree(items, value).expandedKeys);
 	};

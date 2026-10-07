@@ -474,6 +474,60 @@ describe('RestrictFieldsModal', () => {
 		expect(screen.queryByText('no-fields-were-found')).toBeNull();
 	});
 
+	it('restores the expansion from before the filter when the query is cleared', async () => {
+		fetch.mockResponseOnce(JSON.stringify(mockTool));
+
+		renderModal();
+
+		await findCheckbox('modifiedBy');
+
+		await expand('modifiedBy');
+
+		await search('label');
+
+		expect(checkbox('label')).toBeInTheDocument();
+		expect(
+			screen.queryByRole('checkbox', {
+				hidden: true,
+				name: 'userGroupBriefs',
+			})
+		).toBeNull();
+
+		await userEvent.clear(searchBox());
+
+		await waitFor(() =>
+			expect(screen.queryByRole('checkbox', {name: 'label'})).toBeNull()
+		);
+		expect(checkbox('userGroupBriefs')).toBeInTheDocument();
+		expect(checkbox('description')).toBeVisible();
+	});
+
+	it('discards the expansions toggled under a filter when the query is cleared', async () => {
+		fetch.mockResponseOnce(JSON.stringify(mockTool));
+
+		renderModal();
+
+		await findCheckbox('modifiedBy');
+
+		await expand('modifiedBy');
+
+		await search('userGroupBriefs');
+
+		await userEvent.click(
+			screen.getByRole('button', {expanded: true, name: 'modifiedBy'})
+		);
+
+		expect(
+			screen.getByRole('button', {expanded: false, name: 'modifiedBy'})
+		).toBeInTheDocument();
+
+		await userEvent.clear(searchBox());
+
+		expect(
+			screen.getByRole('button', {expanded: true, name: 'modifiedBy'})
+		).toBeInTheDocument();
+	});
+
 	it('moves the focus to the first visible field when deselect all removes its button under a filter', async () => {
 		fetch.mockResponseOnce(JSON.stringify(mockTool));
 
