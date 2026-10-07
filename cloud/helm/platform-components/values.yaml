@@ -42,7 +42,6 @@ clusterSecretStore:
     provider: {}
 deploymentContext:
     deploymentName: ""
-    region: ""
 gateway:
     envoyProxy:
         podAnnotations: {}
