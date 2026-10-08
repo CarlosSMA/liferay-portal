@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {createPlaceAutocompleteSession} from '../../src/main/resources/META-INF/resources/js/placeAutocomplete';
+
 describe('placeAutocomplete', () => {
 	let fetchPlace;
 	let fetchPlaceSuggestions;
@@ -24,12 +26,8 @@ describe('placeAutocomplete', () => {
 	});
 
 	beforeEach(() => {
-		jest.resetModules();
-
-		({
-			fetchPlace,
-			fetchPlaceSuggestions,
-		} = require('../../src/main/resources/META-INF/resources/js/placeAutocomplete'));
+		({fetchPlace, fetchPlaceSuggestions} =
+			createPlaceAutocompleteSession());
 
 		mockFetchAutocompleteSuggestions = jest.fn();
 		mockSessionTokens = [];
@@ -67,6 +65,17 @@ describe('placeAutocomplete', () => {
 		);
 
 		expect(position.address).toBe('P.º de la Castellana, 280');
+	});
+
+	it('keeps a separate session token for each session', async () => {
+		mockFetchAutocompleteSuggestions.mockResolvedValue({suggestions: []});
+
+		const otherSession = createPlaceAutocompleteSession();
+
+		await fetchPlaceSuggestions('castellana');
+		await otherSession.fetchPlaceSuggestions('montefino');
+
+		expect(mockSessionTokens).toHaveLength(2);
 	});
 
 	it('returns an empty list when the Places API is unavailable', async () => {
