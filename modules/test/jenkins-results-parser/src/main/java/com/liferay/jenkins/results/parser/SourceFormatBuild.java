@@ -321,13 +321,17 @@ public class SourceFormatBuild
 	}
 
 	private String _getSourceFormatterVersion() {
-		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
-			_getPortalWorkspaceGitRepository();
+		String sourceFormatterVersion =
+			_getSourceFormatterVersionFromConsoleText();
 
-		if (portalWorkspaceGitRepository == null) {
-			return null;
+		if (sourceFormatterVersion != null) {
+			return sourceFormatterVersion;
 		}
 
+		return _getSourceFormatterVersionFromIvyXML();
+	}
+
+	private String _getSourceFormatterVersionFromConsoleText() {
 		try {
 			String sourceFormatterVersion = null;
 
@@ -341,11 +345,19 @@ public class SourceFormatBuild
 				}
 			}
 
-			if (sourceFormatterVersion != null) {
-				return sourceFormatterVersion;
-			}
+			return sourceFormatterVersion;
 		}
 		catch (Exception exception) {
+			return null;
+		}
+	}
+
+	private String _getSourceFormatterVersionFromIvyXML() {
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
+
+		if (portalWorkspaceGitRepository == null) {
+			return null;
 		}
 
 		File ivyXMLFile = new File(

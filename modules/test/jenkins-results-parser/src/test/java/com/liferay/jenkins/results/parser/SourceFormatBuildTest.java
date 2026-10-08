@@ -97,15 +97,15 @@ public class SourceFormatBuildTest
 		Workspace workspace = Mockito.mock(Workspace.class);
 
 		Mockito.when(
-			workspace.getPrimaryWorkspaceGitRepository()
-		).thenReturn(
-			portalWorkspaceGitRepository
-		);
-
-		Mockito.when(
 			sourceFormatBuild.getWorkspace()
 		).thenReturn(
 			workspace
+		);
+
+		Mockito.when(
+			workspace.getPrimaryWorkspaceGitRepository()
+		).thenReturn(
+			portalWorkspaceGitRepository
 		);
 
 		return ReflectionTestUtil.invoke(
