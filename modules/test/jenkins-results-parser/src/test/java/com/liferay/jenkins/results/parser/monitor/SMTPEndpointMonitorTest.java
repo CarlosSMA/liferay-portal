@@ -111,14 +111,15 @@ public class SMTPEndpointMonitorTest
 		MonitorResult monitorResult = _execute(_URL);
 
 		testEquals(
-			"EHLO [127.0.0.1]\r\nSTARTTLS\r\n",
-			byteArrayOutputStream.toString());
-		testEquals(
 			JenkinsResultsParserUtil.combine(
 				"Unable to read ", _URL,
 				": PKIX path validation failed: validity check failed"),
 			monitorResult.getMessage());
 		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
+
+		testEquals(
+			"EHLO [127.0.0.1]\r\nSTARTTLS\r\n",
+			byteArrayOutputStream.toString());
 	}
 
 	@Test
@@ -171,15 +172,16 @@ public class SMTPEndpointMonitorTest
 		MonitorResult monitorResult = _execute(_URL);
 
 		testEquals(
-			"EHLO [127.0.0.1]\r\nSTARTTLS\r\n",
-			byteArrayOutputStream.toString());
-		testEquals("QUIT\r\n", sslByteArrayOutputStream.toString());
-		testEquals(
 			JenkinsResultsParserUtil.combine(
 				"Endpoint ", _URL,
 				" returned the reply code 500 to the \"QUIT\" command"),
 			monitorResult.getMessage());
 		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
+
+		testEquals(
+			"EHLO [127.0.0.1]\r\nSTARTTLS\r\n",
+			byteArrayOutputStream.toString());
+		testEquals("QUIT\r\n", sslByteArrayOutputStream.toString());
 	}
 
 	@Test
@@ -399,8 +401,8 @@ public class SMTPEndpointMonitorTest
 
 		MonitorResult monitorResult = _execute(_URL);
 
-		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
 		testEquals(expectedMessage, monitorResult.getMessage());
+		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
 	}
 
 	private void _testExecuteInvalidURL(String url) throws Exception {
@@ -452,12 +454,13 @@ public class SMTPEndpointMonitorTest
 
 		MonitorResult monitorResult = _execute(_URL);
 
-		testEquals("QUIT\r\n", sslByteArrayOutputStream.toString());
 		testEquals(
 			JenkinsResultsParserUtil.combine("Endpoint ", _URL, " is OK"),
 			monitorResult.getMessage());
 		testEquals(MonitorResult.Status.OK, monitorResult.getStatus());
+
 		testEquals(expectedOutput, byteArrayOutputStream.toString());
+		testEquals("QUIT\r\n", sslByteArrayOutputStream.toString());
 
 		ArgumentCaptor<Integer> argumentCaptor = ArgumentCaptor.forClass(
 			Integer.class);
@@ -495,9 +498,10 @@ public class SMTPEndpointMonitorTest
 
 		MonitorResult monitorResult = _execute(_URL);
 
-		testEquals("", byteArrayOutputStream.toString());
-		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
 		testEquals(expectedMessage, monitorResult.getMessage());
+		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
+
+		testEquals("", byteArrayOutputStream.toString());
 
 		ArgumentCaptor<Integer> argumentCaptor = ArgumentCaptor.forClass(
 			Integer.class);
@@ -525,8 +529,8 @@ public class SMTPEndpointMonitorTest
 
 		MonitorResult monitorResult = _execute(_URL);
 
-		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
 		testEquals(expectedMessage, monitorResult.getMessage());
+		testEquals(MonitorResult.Status.CRITICAL, monitorResult.getStatus());
 
 		testEquals(expectedOutput, byteArrayOutputStream.toString());
 	}
