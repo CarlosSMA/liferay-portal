@@ -72,9 +72,6 @@ exports[`ClayEmptyState renders with a reduced motion image provided 1`] = `
       class="c-empty-state-image"
     >
       <div
-        class="c-empty-state-illustration"
-      />
-      <div
         class="c-empty-state-aspect-ratio"
       >
         <img
@@ -113,9 +110,6 @@ exports[`ClayEmptyState renders with an image provided 1`] = `
     <div
       class="c-empty-state-image"
     >
-      <div
-        class="c-empty-state-illustration"
-      />
       <div
         class="c-empty-state-aspect-ratio"
       >
@@ -172,9 +166,6 @@ exports[`ClayEmptyState renders with different image props 1`] = `
       class="c-empty-state-image"
     >
       <div
-        class="c-empty-state-illustration"
-      />
-      <div
         class="c-empty-state-aspect-ratio"
       >
         <img
@@ -213,9 +204,6 @@ exports[`ClayEmptyState renders with different reduced motion image props 1`] = 
     <div
       class="c-empty-state-image"
     >
-      <div
-        class="c-empty-state-illustration"
-      />
       <div
         class="c-empty-state-aspect-ratio"
       >

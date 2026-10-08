@@ -107,9 +107,11 @@ function EmptyState({
 		>
 			{hasImg && (
 				<div className="c-empty-state-image">
-					<div className="c-empty-state-illustration">{image}</div>
-
-					{!image && (
+					{image ? (
+						<div className="c-empty-state-illustration">
+							{image}
+						</div>
+					) : (
 						<div className="c-empty-state-aspect-ratio">
 							<img
 								alt=""
