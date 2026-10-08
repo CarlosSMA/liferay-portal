@@ -40,11 +40,14 @@ function createPlaceAutocompleteSession() {
 	async function fetchPlace(placePrediction) {
 		const place = placePrediction.toPlace();
 
-		await place.fetchFields({
-			fields: ['formattedAddress', 'location', 'viewport'],
-		});
-
-		sessionToken = null;
+		try {
+			await place.fetchFields({
+				fields: ['formattedAddress', 'location', 'viewport'],
+			});
+		}
+		finally {
+			sessionToken = null;
+		}
 
 		const address = place.formattedAddress || String(placePrediction.text);
 
