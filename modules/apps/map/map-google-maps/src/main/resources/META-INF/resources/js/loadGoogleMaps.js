@@ -80,4 +80,3 @@ function loadGoogleMaps(googleMapsAPIKey, callback) {
 }
 
 export default loadGoogleMaps;
-export {loadGoogleMaps};
