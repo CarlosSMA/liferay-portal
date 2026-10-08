@@ -109,10 +109,10 @@ public class PortalCatapultImpl implements PortalCatapult {
 
 					Http.Response response = options.getResponse();
 
-					if ((response.getResponseCode() <
-							HttpURLConnection.HTTP_OK) ||
-						(response.getResponseCode() >=
-							HttpURLConnection.HTTP_MULT_CHOICE)) {
+					if ((response.getResponseCode() >=
+							HttpURLConnection.HTTP_MULT_CHOICE) ||
+						(response.getResponseCode() <
+							HttpURLConnection.HTTP_OK)) {
 
 						throw new PortalException(new String(bytes));
 					}
