@@ -544,8 +544,8 @@ public class BundleSiteInitializerTest {
 
 	@Test
 	public void testInitializeFromFileWithoutLayoutSetTheme() throws Exception {
-		_updateLayoutSetTheme(false, "cms_WAR_cmstheme");
-		_updateLayoutSetTheme(true, "cms_WAR_cmstheme");
+		_updateLookAndFeel(false, "cms_WAR_cmstheme");
+		_updateLookAndFeel(true, "cms_WAR_cmstheme");
 
 		File tempDir = FileUtil.createTempFolder();
 
@@ -5001,7 +5001,7 @@ public class BundleSiteInitializerTest {
 		_assertUserAccounts2();
 	}
 
-	private void _updateLayoutSetTheme(boolean privateLayout, String themeId)
+	private void _updateLookAndFeel(boolean privateLayout, String themeId)
 		throws Exception {
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
