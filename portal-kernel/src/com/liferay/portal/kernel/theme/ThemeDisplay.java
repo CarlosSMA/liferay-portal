@@ -615,11 +615,6 @@ public class ThemeDisplay
 		return _contextPath;
 	}
 
-	/**
-	 * Returns the URL for the control panel's empty state spritemap.
-	 *
-	 * @return the URL for the control panel's empty state spritemap
-	 */
 	public String getPathControlPanelEmptyStatesSpritemap() {
 		return _pathControlPanelEmptyStatesSpritemap;
 	}
@@ -705,11 +700,6 @@ public class ThemeDisplay
 		return _pathThemeCss;
 	}
 
-	/**
-	 * Returns the URL for the theme's empty state spritemap.
-	 *
-	 * @return the URL for the theme's empty state spritemap
-	 */
 	public String getPathThemeEmptyStatesSpritemap() {
 		return _pathThemeEmptyStatesSpritemap;
 	}
