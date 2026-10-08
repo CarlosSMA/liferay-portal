@@ -66,6 +66,12 @@ function createPlaceAutocompleteSession() {
 	 * The legacy Autocomplete widget is not enabled for new Google Cloud
 	 * projects, so suggestions go through this API and the caller renders
 	 * them itself.
+	 *
+	 * Returns an empty list for empty input or when Google Maps was loaded
+	 * without the places library.
+	 *
+	 * Callers must handle the rejection: the promise rejects when the request
+	 * fails, such as when Places API (New) is not enabled for the API key.
 	 * @param {string} inputValue Text typed into the address input
 	 * @return {Promise<Array<Object>>} Place predictions for the typed text
 	 */
