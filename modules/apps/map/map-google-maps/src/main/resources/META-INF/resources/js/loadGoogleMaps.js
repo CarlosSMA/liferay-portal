@@ -59,7 +59,7 @@ function loadGoogleMaps(googleMapsAPIKey, callback) {
 	let apiURL = `${location.protocol}//maps.googleapis.com/maps/api/js?v=weekly&libraries=places&callback=Liferay.Maps.onGMapsReady`;
 
 	if (googleMapsAPIKey) {
-		apiURL += `&key=${googleMapsAPIKey}`;
+		apiURL += `&key=${encodeURIComponent(googleMapsAPIKey)}`;
 	}
 
 	// Add the script, and remove it if it fails so the next call can retry.
