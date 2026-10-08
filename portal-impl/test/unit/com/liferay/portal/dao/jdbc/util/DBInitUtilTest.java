@@ -140,15 +140,15 @@ public class DBInitUtilTest {
 				Mockito.mockStatic(ReleaseInfo.class)) {
 
 			portalUpgradeProcessMockedStatic.when(
-				() -> PortalUpgradeProcess.hasPortalRelease(connection)
-			).thenReturn(
-				true
-			);
-
-			portalUpgradeProcessMockedStatic.when(
 				() -> PortalUpgradeProcess.getCurrentBuildDate(connection)
 			).thenReturn(
 				currentBuildDate
+			);
+
+			portalUpgradeProcessMockedStatic.when(
+				() -> PortalUpgradeProcess.hasPortalRelease(connection)
+			).thenReturn(
+				true
 			);
 
 			releaseInfoMockedStatic.when(
