@@ -35,7 +35,7 @@ The yarn side does not always run. `portal-impl/build.xml` sets `skip.node.task`
 
 When `git status --porcelain` is nonempty after the formatter (fixable subset applied to the working tree), stage the tracked modifications with `git add --update` and create a commit titled `<TICKET> SF`.
 
-Use `--update` rather than `--all`. The formatter edits files that already exist, so `--update` covers everything it does, while `--all` also sweeps in whatever else is untracked in the tree at that moment. The run reaches `downloadNode` and `yarnInstall` on the way, after the **SDK** precondition has run `ant setup-sdk`, and those stay out of the commit only because `.gitignore` happens to cover them. List the staged files against the paths the formatter named before committing, and report any it did not.
+Use `--update` rather than `--all`. The formatter edits files that already exist, so `--update` covers everything it does, while `--all` also sweeps in whatever else is untracked in the tree at that moment. The **SDK** precondition runs `ant setup-sdk` before the formatter, which reaches `downloadNode` and `yarnInstall` on the way, and the output of all three stays out of the commit only because `.gitignore` happens to cover it. List the staged files against the paths the formatter named before committing, and report any it did not.
 
 When the commit fails, record the failure and continue to the next validation.
 

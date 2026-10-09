@@ -74,7 +74,7 @@ done
 
 Leave out `modules/dxp/apps/saml/saml-admin-rest-test` and every module under `modules/sdk`. Convert each module to its Gradle project path with `sed "s#^modules/##; s#/#:#g"`, and keep two sorted lists: the `testIntegration` consumers and the deprecated consumers.
 
-Assert the search root before believing an empty result, since `git grep` exits 1 with no output both for a clean scan and for a pathspec that matches nothing, so a search from the wrong directory is byte for byte what a genuinely clean scan returns:
+Assert the search root before believing an empty result. `git grep` exits 1 with no output both for a clean scan and for a pathspec that matches nothing, so a search from the wrong directory returns, byte for byte, what a genuinely clean scan returns:
 
 ```bash
 [[ -d ${REPO_ROOT}/modules ]] || exit 1

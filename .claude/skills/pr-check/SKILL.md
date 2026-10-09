@@ -194,13 +194,13 @@ Process each validation in a subagent.
 
 ### Pass 1: Estimate
 
-Run [select_validations.sh](select_validations.sh) beside this document once, from `${REPO_ROOT}`. It prints a line for every validation, `== <file> (<count> paths)` for one that fires, followed by its `## Preconditions` and `## Time Estimate` sections, and `-- <file> (not fired)` for one that does not. A workspace validation names its workspace after the file. A validation fires when `select_paths.sh` prints a path, and a workspace validation is tried once for each workspace the branch changed, as **Routing** describes:
+Run [select_validations.sh](select_validations.sh) beside this document once, from `${REPO_ROOT}`. It prints a line for every validation: `== <file> (<count> paths)` for one that fires, followed by its `## Preconditions` and `## Time Estimate` sections, and `-- <file> (not fired)` for one that does not. A workspace validation names its workspace after the file. A validation fires when `select_paths.sh` prints a path, and a workspace validation is tried once for each workspace the branch changed, as **Routing** describes:
 
 ```bash
 bash <skill directory>/select_validations.sh "$(git merge-base HEAD "${BASE_BRANCH}")"
 ```
 
-Leave out the validations the settings skip or whose scope they disable. Sum the time estimates of the rest for the cumulative total, counting a workspace validation once for each workspace it fired for, and add about 3 minutes once when any of them names **Portal Snapshots**, and up to 2 minutes once when any names **Portal Classpath**. Estimate from the path counts the script prints rather than resolving modules, since the total only decides whether to ask the developer.
+Leave out the validations the settings skip or whose scope they disable. Sum the time estimates of the rest for the cumulative total, counting a workspace validation once for each workspace it fired for. Add about 3 minutes once when any of them names **Portal Snapshots**, and up to 2 minutes once when any names **Portal Classpath**. Estimate from the path counts the script prints rather than resolving modules, since the total only decides whether to ask the developer.
 
 When the total exceeds 20 minutes, surface the breakdown and ask the developer whether to trim a validation or proceed.
 
@@ -208,7 +208,7 @@ The output, less the validations the settings skip or whose scope they disable, 
 
 ### Shared Preconditions
 
-A validation names the setup it needs under `## Preconditions`, and its **Command** never performs that setup itself. Take the union of the names across the validations that fired and run each once, after Pass 1 and before Pass 2 dispatches anything. Dedupe on the name rather than the command, and take nothing from a validation that did not fire, so a diff of Markdown alone installs no snapshot. Run them in the order below, since **Portal Classpath** deploys the jars **Portal Snapshots** builds.
+A validation names the setup it needs under `## Preconditions`, and its **Command** never performs that setup itself. Take the union of the names across the validations that fired and run each once, after Pass 1 and before Pass 2 dispatches anything. Deduplicate by name rather than by command, and take nothing from a validation that did not fire, so a diff of Markdown alone installs no snapshot. Run them in the order below, since **Portal Classpath** deploys the jars **Portal Snapshots** builds.
 
 - **Portal Snapshots.** Build the top level Ant projects and install each as a snapshot under `${REPO_ROOT}/.m2`, so that a module compiles against the branch's own kernel rather than whatever an earlier build left there:
 
@@ -216,7 +216,7 @@ A validation names the setup it needs under `## Preconditions`, and its **Comman
 	(cd "${REPO_ROOT}" && ant compile install-portal-snapshots)
 	```
 
-	A build that exits zero has not yet proved the tree usable. Confirm that each of the seven projects **Baseline** compares left its jar and installed its snapshot at the version its `bnd.bnd` declares. The loop prints each project that did not, and empty output is the pass:
+	A build that exits zero has not yet proved the tree usable. Confirm that each of the seven projects **Baseline** compares left its jar and installed its snapshot at the version its `bnd.bnd` declares. The loop prints each project that did not, so empty output is a pass:
 
 	```bash
 	for project in portal-impl portal-kernel portal-test util-bridges util-java util-slf4j util-taglib
@@ -233,7 +233,7 @@ A validation names the setup it needs under `## Preconditions`, and its **Comman
 
 	A snapshot that an earlier build installed at an older version looks present to anything but this check, and the first compile that needs the branch's version fails on `Could not find com.liferay.portal.test:<version>-SNAPSHOT`.
 
-- **Portal Classpath.** Deploy the jars a module's test classpath reads from the app server, which `modules/build.gradle` takes from the bundle's `WEB-INF/lib` and `WEB-INF/shielded-container-lib`. A `testIntegration` compile gets `portal-kernel`, `portal-impl`, and `petra` only from there, and a unit test gets `log4j` only from there, so without them both fail on every branch alike. This is the unit test bundle CI's `prepare-test-bundles` builds, plus `util-taglib` and `modules/core`, which a `testIntegration` compile also reads. Each `ant deploy` copies the jar **Portal Snapshots** already built, so the deploys run in any order. Leave out the `unzip-tomcat` step CI runs first, since it starts by deleting `${app.server.tomcat.dir}`, the bundle the developer runs and every checkout shares, and the deploys create the directories they write to:
+- **Portal Classpath.** Deploy the jars a module's test classpath reads from the app server, which `modules/build.gradle` takes from the bundle's `WEB-INF/lib` and `WEB-INF/shielded-container-lib`. A `testIntegration` compile gets `portal-kernel`, `portal-impl`, and `petra` only from there, and a unit test gets `log4j` only from there, so without them both fail on every branch alike. This is the unit test bundle CI's `prepare-test-bundles` builds, plus `util-taglib` and `modules/core`, which a `testIntegration` compile also reads. Each `ant deploy` copies the jar **Portal Snapshots** already built, so the deploys run in any order. Leave out the `unzip-tomcat` step CI runs first. It starts by deleting `${app.server.tomcat.dir}`, the bundle the developer runs and every checkout shares, and the deploys create the directories they write to without it:
 
 	```bash
 	(cd "${REPO_ROOT}" && ant deploy-additional-jars)
@@ -255,7 +255,7 @@ A validation names the setup it needs under `## Preconditions`, and its **Comman
 	(cd "${REPO_ROOT}" && ant setup-sdk)
 	```
 
-When a precondition fails, stop the run. Dispatch no validation, publish no Results Summary, and report the precondition, the decisive lines of its log, and the validations that named it. A validation cannot report this on its own behalf, since it sees only its own **Command** and cannot know its setup never ran, and a `NOT VERIFIED` row in its place would still publish a `success` marker for a run that never set up.
+When a precondition fails, stop the run. Dispatch no validation, publish no Results Summary, and report the precondition, the decisive lines of its log, and the validations that named it. A validation cannot report this on its own behalf, since it sees only its own **Command** and cannot know that its setup never ran, and a `NOT VERIFIED` row in its place would still publish a `success` marker for a run that was never set up.
 
 ### Pass 2: Execute
 
@@ -277,7 +277,7 @@ A validation returns one of five results:
 
 `NO COVERAGE`, `NOT APPLICABLE`, and `NOT VERIFIED` do not block. Each carries a reason naming what went unexamined, and `NO COVERAGE` and `NOT VERIFIED` keep their row in the table with whatever detail the validation asks for beneath it.
 
-A `FAIL` run still autocommits where its **Autocommit** section says to, because a formatter's repairs are worth keeping even when an unfixable violation blocks the branch. A run that ends `NO COVERAGE`, `NOT APPLICABLE`, or `NOT VERIFIED` does not autocommit, since a run that established nothing has produced nothing worth recording and the tree it would stage may hold a half finished setup. A `PASS` run autocommits as well. Tell the subagent this when you dispatch it, since its **Autocommit** section reads as unconditional on its own.
+A `FAIL` run still autocommits where its **Autocommit** section says to, because a formatter's repairs are worth keeping even when an unfixable violation blocks the branch, and so does a `PASS` run. A run that ends `NO COVERAGE`, `NOT APPLICABLE`, or `NOT VERIFIED` does not autocommit, since a run that established nothing has produced nothing worth recording and the tree it would stage may hold a half finished setup. Tell the subagent this when you dispatch it, since its **Autocommit** section reads as unconditional on its own.
 
 Run workspace validations one workspace at a time. Each workspace build has its own Gradle daemon and heap and shares the Gradle cache with the others. Never pass `--offline` to a workspace build, since a cache miss under it prints as a dependency error that reads exactly like a compile failure.
 
