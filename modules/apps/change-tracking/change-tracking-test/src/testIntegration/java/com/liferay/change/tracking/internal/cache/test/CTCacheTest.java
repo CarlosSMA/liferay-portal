@@ -331,7 +331,7 @@ public class CTCacheTest {
 	}
 
 	@Test
-	public void testDeleteClearsCollectionCounts() throws Exception {
+	public void testDeleteClearsCTCollectionCounts() throws Exception {
 		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
 
 		FinderPath finderPath = new FinderPath(
