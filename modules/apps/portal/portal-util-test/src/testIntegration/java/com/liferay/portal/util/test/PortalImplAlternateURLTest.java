@@ -284,29 +284,26 @@ public class PortalImplAlternateURLTest {
 
 		FriendlyURLResolverRegistryUtil.removeURLSeparators();
 
-		try {
-			Collection<Locale> availableLocales = Arrays.asList(
-				LocaleUtil.US, LocaleUtil.SPAIN, LocaleUtil.GERMANY);
-			Locale defaultLocale = LocaleUtil.US;
+		Collection<Locale> availableLocales = Arrays.asList(
+			LocaleUtil.US, LocaleUtil.SPAIN, LocaleUtil.GERMANY);
+		Locale defaultLocale = LocaleUtil.US;
 
-			_group = GroupTestUtil.updateDisplaySettings(
-				_group.getGroupId(), availableLocales, defaultLocale);
+		_group = GroupTestUtil.updateDisplaySettings(
+			_group.getGroupId(), availableLocales, defaultLocale);
 
-			_testAlternateURLWithLayout(
-				availableLocales, defaultLocale,
-				HashMapBuilder.put(
-					LocaleUtil.GERMANY, urlSeparator + _getRandomFriendlyURL()
-				).put(
-					LocaleUtil.SPAIN, urlSeparator + _getRandomFriendlyURL()
-				).put(
-					LocaleUtil.US, urlSeparator + _getRandomFriendlyURL()
-				).build());
-		}
-		finally {
-			serviceRegistration.unregister();
+		_testAlternateURLWithLayout(
+			availableLocales, defaultLocale,
+			HashMapBuilder.put(
+				LocaleUtil.GERMANY, urlSeparator + _getRandomFriendlyURL()
+			).put(
+				LocaleUtil.SPAIN, urlSeparator + _getRandomFriendlyURL()
+			).put(
+				LocaleUtil.US, urlSeparator + _getRandomFriendlyURL()
+			).build());
 
-			FriendlyURLResolverRegistryUtil.removeURLSeparators();
-		}
+		serviceRegistration.unregister();
+
+		FriendlyURLResolverRegistryUtil.removeURLSeparators();
 	}
 
 	@Test
