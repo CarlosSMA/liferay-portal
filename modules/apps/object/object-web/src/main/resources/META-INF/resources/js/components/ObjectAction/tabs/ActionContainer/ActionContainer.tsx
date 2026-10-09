@@ -366,7 +366,7 @@ export function ActionContainer({
 						}
 						error={errors.urlHostsAllowed}
 						feedbackMessage={Liferay.Language.get(
-							'enter-a-comma-separated-list-of-the-host-names-the-webhook-may-request'
+							'enter-a-comma-delimited-list-of-the-host-names-the-webhook-may-request'
 						)}
 						id="urlHostsAllowedInput"
 						label={Liferay.Language.get('hosts-allowed')}
